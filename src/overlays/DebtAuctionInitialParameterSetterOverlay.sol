@@ -1,0 +1,27 @@
+pragma solidity 0.6.7;
+
+import "../auth/GebAuth.sol";
+
+abstract contract DebtAuctionInitialParameterSetterLike {
+    function modifyParameters(bytes32, address) virtual external;
+}
+contract DebtAuctionInitialParameterSetterOverlay is GebAuth {
+    DebtAuctionInitialParameterSetterLike public debtAuctionParamSetter;
+
+    constructor(address debtAuctionParamSetter_) public GebAuth() {
+        require(debtAuctionParamSetter_ != address(0), "DebtAuctionInitialParameterSetterOverlay/null-address");
+        debtAuctionParamSetter = DebtAuctionInitialParameterSetterLike(debtAuctionParamSetter_);
+    }
+
+    // --- Boolean Logic ---
+    function either(bool x, bool y) internal pure returns (bool z) {
+        assembly{ z := or(x, y)}
+    }
+
+    function modifyParameters(bytes32 parameter, address data) external isAuthorized {
+        if (either(parameter == "protocolTokenOrcl", parameter == "systemCoinOrcl")) {
+            debtAuctionParamSetter.modifyParameters(parameter, data);
+        }
+        else revert("DebtAuctionInitialParameterSetterOverlay/modify-forbidden-param");
+    }
+}

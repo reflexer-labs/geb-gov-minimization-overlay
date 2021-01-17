@@ -1,0 +1,30 @@
+pragma solidity 0.6.7;
+
+import "../auth/GebAuth.sol";
+
+abstract contract LiquidationEngineLike {
+    function connectSAFESaviour(address) virtual external;
+    function disconnectSAFESaviour(address) virtual external;
+    function modifyParameters(bytes32, uint256) virtual external;
+}
+contract LiquidationEngineOverlay is GebAuth {
+    LiquidationEngineLike public liquidationEngine;
+
+    constructor(address liquidationEngine_) public GebAuth() {
+        require(liquidationEngine_ != address(0), "LiquidationEngineOverlay/null-address");
+        liquidationEngine = LiquidationEngineLike(liquidationEngine_);
+    }
+
+    function modifyParameters(bytes32 parameter) external isAuthorized {
+        require(parameter == "onAuctionSystemCoinLimit", "LiquidationEngineOverlay/invalid-param");
+        liquidationEngine.modifyParameters(parameter, uint(-1));
+    }
+    function connectSAFESaviour(address saviour) external isAuthorized {
+        require(saviour != address(0), "LiquidationEngineOverlay/null-saviour");
+        liquidationEngine.connectSAFESaviour(saviour);
+    }
+    function disconnectSAFESaviour(address saviour) external isAuthorized {
+        require(saviour != address(0), "LiquidationEngineOverlay/null-saviour");
+        liquidationEngine.disconnectSAFESaviour(saviour);
+    }
+}
