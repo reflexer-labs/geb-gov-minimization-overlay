@@ -59,7 +59,7 @@ contract TaxCollectorOverlay is GebAuth {
         uint256 upperBound = stabilityFeeBounds[collateralType].upperBound;
         require(
           both(upperBound > lowerBound, lowerBound >= RAY),
-          "TaxCollectorOverlay/bounds/already-set"
+          "TaxCollectorOverlay/bounds-already-set"
         );
         require(both(data <= upperBound, data >= lowerBound), "TaxCollectorOverlay/fee-exceeds-bounds");
         require(parameter == "stabilityFee", "TaxCollectorOverlay/invalid-parameter");
