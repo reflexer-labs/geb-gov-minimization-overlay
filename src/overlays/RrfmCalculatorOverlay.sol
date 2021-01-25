@@ -40,6 +40,7 @@ contract RrfmCalculatorOverlay is GebAuth {
           both(signedParams.length == signedUpperBounds.length, signedParams.length == signedLowerBounds.length),
           "RrfmCalculatorOverlay/invalid-signed-lengths"
         );
+        require(calculator_ != address(0), "RrfmCalculatorOverlay/null-calculator");
 
         uint256 i;
         for (i = 0; i < unsignedParams.length; i++) {

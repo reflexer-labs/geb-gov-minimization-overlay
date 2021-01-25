@@ -15,16 +15,10 @@ contract LiquidationEngineOverlay is GebAuth {
         liquidationEngine = LiquidationEngineLike(liquidationEngine_);
     }
 
-    function modifyParameters(bytes32 parameter) external isAuthorized {
-        require(parameter == "onAuctionSystemCoinLimit", "LiquidationEngineOverlay/invalid-param");
-        liquidationEngine.modifyParameters(parameter, uint(-1));
-    }
     function connectSAFESaviour(address saviour) external isAuthorized {
-        require(saviour != address(0), "LiquidationEngineOverlay/null-saviour");
         liquidationEngine.connectSAFESaviour(saviour);
     }
     function disconnectSAFESaviour(address saviour) external isAuthorized {
-        require(saviour != address(0), "LiquidationEngineOverlay/null-saviour");
         liquidationEngine.disconnectSAFESaviour(saviour);
     }
 }

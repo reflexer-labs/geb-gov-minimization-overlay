@@ -26,13 +26,4 @@ contract OracleRelayerOverlay is GebAuth {
           oracleRelayer.modifyParameters("redemptionRate", RAY);
         } else revert("OracleRelayerOverlay/modify-forbidden-param");
     }
-
-    function modifyParameters(
-      bytes32 collateralType,
-      bytes32 parameter,
-      address data
-    ) external {
-        require(parameter == "orcl", "OracleRelayerOverlay/modify-forbidden-param");
-        oracleRelayer.modifyParameters(collateralType, parameter, data);
-    }
 }
