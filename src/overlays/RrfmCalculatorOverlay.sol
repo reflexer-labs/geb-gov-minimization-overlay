@@ -81,7 +81,7 @@ contract RrfmCalculatorOverlay is GebAuth {
     function modifyParameters(bytes32 parameter, int256 val) external {
         SignedBounds memory bounds = signedBounds[parameter];
 
-        if (parameter == "priceDeviationCumulative") {
+        if (parameter == "pdc") {
             calculator.modifyParameters(parameter, int(0));
         }
         else if (either(bounds.upperBound != 0, bounds.lowerBound != 0)) {

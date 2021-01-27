@@ -6,7 +6,7 @@ abstract contract CollateralAuctionHouseLike {
     function modifyParameters(bytes32, address) virtual external;
 }
 contract MultiCollateralAuctionHouseOverlay is GebAuth {
-    constructor(address[] memory collateralAuctionHouses_) public GebAuth() {}
+    constructor() public GebAuth() {}
 
     function modifyParameters(address collateralAuctionHouse, bytes32 parameter, address data) external isAuthorized {
         if (parameter == "systemCoinOracle") {

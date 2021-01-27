@@ -4,11 +4,6 @@ import "../auth/GebAuth.sol";
 
 abstract contract OracleRelayerLike {
     function modifyParameters(bytes32, uint256) virtual external;
-    function modifyParameters(
-      bytes32,
-      bytes32,
-      address
-    ) virtual external;
     function redemptionPrice() virtual public returns (uint256);
 }
 contract OracleRelayerOverlay is GebAuth {
@@ -20,10 +15,8 @@ contract OracleRelayerOverlay is GebAuth {
         oracleRelayer = OracleRelayerLike(oracleRelayer_);
     }
 
-    function restartRedemptionRate(bytes32 parameter) external isAuthorized {
-        if (parameter == "redemptionRate") {
-          oracleRelayer.redemptionPrice();
-          oracleRelayer.modifyParameters("redemptionRate", RAY);
-        } else revert("OracleRelayerOverlay/modify-forbidden-param");
+    function restartRedemptionRate() external isAuthorized {
+        oracleRelayer.redemptionPrice();
+        oracleRelayer.modifyParameters("redemptionRate", RAY);
     }
 }
