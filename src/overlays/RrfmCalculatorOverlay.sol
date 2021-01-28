@@ -45,13 +45,13 @@ contract RrfmCalculatorOverlay is GebAuth {
         uint256 i;
         for (i = 0; i < unsignedParams.length; i++) {
             require(either(unsignedUpperBounds[i] != 0, unsignedLowerBounds[i] != 0), "RrfmCalculatorOverlay/invalid-uint-bounds");
-            require(unsignedUpperBounds[i] > unsignedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-uint-bounds");
+            require(unsignedUpperBounds[i] >= unsignedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-uint-bounds");
             unsignedBounds[unsignedParams[i]] = UnsignedBounds(unsignedUpperBounds[i], unsignedLowerBounds[i]);
         }
         for (i = 0; i < signedParams.length; i++) {
             require(either(signedUpperBounds[i] != 0, signedLowerBounds[i] != 0), "RrfmCalculatorOverlay/invalid-int-bounds");
-            require(signedUpperBounds[i] > signedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-int-bounds");
-            signedBounds[signedParams[i]]     = SignedBounds(signedUpperBounds[i], signedLowerBounds[i]);
+            require(signedUpperBounds[i] >= signedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-int-bounds");
+            signedBounds[signedParams[i]] = SignedBounds(signedUpperBounds[i], signedLowerBounds[i]);
         }
 
         calculator = RrfmCalculatorLike(calculator_);
@@ -65,7 +65,7 @@ contract RrfmCalculatorOverlay is GebAuth {
         assembly{ z := or(x, y)}
     }
 
-    function modifyParameters(bytes32 parameter, uint256 val) external {
+    function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         UnsignedBounds memory bounds = unsignedBounds[parameter];
 
         if (parameter == "allReaderToggle") {
@@ -78,7 +78,7 @@ contract RrfmCalculatorOverlay is GebAuth {
         else revert("RrfmCalculatorOverlay/modify-forbidden-param");
     }
 
-    function modifyParameters(bytes32 parameter, int256 val) external {
+    function modifyParameters(bytes32 parameter, int256 val) external isAuthorized {
         SignedBounds memory bounds = signedBounds[parameter];
 
         if (parameter == "pdc") {

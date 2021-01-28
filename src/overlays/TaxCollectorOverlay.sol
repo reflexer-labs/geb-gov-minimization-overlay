@@ -54,7 +54,7 @@ contract TaxCollectorOverlay is GebAuth {
         bytes32 collateralType,
         bytes32 parameter,
         uint256 data
-    ) external {
+    ) external isAuthorized {
         uint256 lowerBound = stabilityFeeBounds[collateralType].lowerBound;
         uint256 upperBound = stabilityFeeBounds[collateralType].upperBound;
         require(
