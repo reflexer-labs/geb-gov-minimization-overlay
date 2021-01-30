@@ -5,7 +5,6 @@ import "../auth/GebAuth.sol";
 abstract contract LiquidationEngineLike {
     function connectSAFESaviour(address) virtual external;
     function disconnectSAFESaviour(address) virtual external;
-    function modifyParameters(bytes32, uint256) virtual external;
 }
 contract LiquidationEngineOverlay is GebAuth {
     LiquidationEngineLike public liquidationEngine;
