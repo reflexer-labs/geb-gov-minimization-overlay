@@ -14,9 +14,17 @@ contract LiquidationEngineOverlay is GebAuth {
         liquidationEngine = LiquidationEngineLike(liquidationEngine_);
     }
 
+    /*
+    * @notify Connect a new safe saviour to the LiquidationEngine
+    * @param saviour The new saviour address
+    */
     function connectSAFESaviour(address saviour) external isAuthorized {
         liquidationEngine.connectSAFESaviour(saviour);
     }
+    /*
+    * @notify Disconnect an existing safe saviour from the LiquidationEngine
+    * @param saviour The saviour address to disconnect
+    */
     function disconnectSAFESaviour(address saviour) external isAuthorized {
         liquidationEngine.disconnectSAFESaviour(saviour);
     }
