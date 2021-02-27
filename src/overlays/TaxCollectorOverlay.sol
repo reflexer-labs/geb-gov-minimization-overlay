@@ -8,16 +8,20 @@ abstract contract TaxCollectorLike {
         bytes32 parameter,
         uint256 data
     ) virtual external;
+    function taxSingle(bytes32) virtual public returns (uint256);
 }
 contract TaxCollectorOverlay is GebAuth {
     // --- Variables ---
+    // Stability fee bounds for every collateral type
     mapping(bytes32 => Bounds) public stabilityFeeBounds;
     TaxCollectorLike           public taxCollector;
 
     // --- Structs ---
     struct Bounds {
-        uint256 upperBound;
-        uint256 lowerBound;
+        // Maximum per second stability fee that can be charged for a collateral type
+        uint256 upperBound;  // [ray]
+        // Minimum per second stability fee that can be charged for a collateral type
+        uint256 lowerBound;  // [ray]
     }
 
     constructor(
@@ -32,12 +36,15 @@ contract TaxCollectorOverlay is GebAuth {
 
         taxCollector = TaxCollectorLike(taxCollector_);
 
+        // Loop through the bounds array and set them for each collateral type
         for (uint i = 0; i < collateralTypes.length; i++) {
+            // Make sure we don't set bounds for the same collateral type twice
             require(
               both(stabilityFeeBounds[collateralTypes[i]].upperBound == 0, stabilityFeeBounds[collateralTypes[i]].lowerBound == 0),
               "TaxCollectorOverlay/bounds/already-set"
             );
-            require(both(lowerBounds[i] >= RAY, upperBounds[i] > lowerBounds[i]), "TaxCollectorOverlay/invalid-bounds");
+            // Make sure the lower bound is not negative and the upper bound is >= the lower bound
+            require(both(lowerBounds[i] >= RAY, upperBounds[i] >= lowerBounds[i]), "TaxCollectorOverlay/invalid-bounds");
             stabilityFeeBounds[collateralTypes[i]] = Bounds(upperBounds[i], lowerBounds[i]);
         }
     }
@@ -50,19 +57,32 @@ contract TaxCollectorOverlay is GebAuth {
     // --- Math ---
     uint256 public constant RAY = 10 ** 27;
 
+    /*
+    * @notice Modify the stability fee for a collateral type; revert if the new fee is not within bounds
+    * @param collateralType The collateral type to change the fee for
+    * @param parameter Must be "stabilityFee"
+    * @param data The new fee
+    */
     function modifyParameters(
         bytes32 collateralType,
         bytes32 parameter,
         uint256 data
     ) external isAuthorized {
+        // Fetch the bounds
         uint256 lowerBound = stabilityFeeBounds[collateralType].lowerBound;
         uint256 upperBound = stabilityFeeBounds[collateralType].upperBound;
+        // Check that the collateral type has bounds
         require(
-          both(upperBound > lowerBound, lowerBound >= RAY),
-          "TaxCollectorOverlay/bounds-already-set"
+          both(upperBound >= lowerBound, lowerBound >= RAY),
+          "TaxCollectorOverlay/bounds-improperly-set"
         );
+        // Check that the new fee is within bounds
         require(both(data <= upperBound, data >= lowerBound), "TaxCollectorOverlay/fee-exceeds-bounds");
+        // Check that the parameter name is correct
         require(parameter == "stabilityFee", "TaxCollectorOverlay/invalid-parameter");
+        // Collect the fee up until now
+        taxCollector.taxSingle(collateralType);
+        // Finally set the new fee
         taxCollector.modifyParameters(collateralType, parameter, data);
     }
 }

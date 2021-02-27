@@ -15,6 +15,9 @@ contract OracleRelayerOverlay is GebAuth {
         oracleRelayer = OracleRelayerLike(oracleRelayer_);
     }
 
+    /*
+    * @notice Reset the redemption rate to 0%
+    */
     function restartRedemptionRate() external isAuthorized {
         oracleRelayer.redemptionPrice();
         oracleRelayer.modifyParameters("redemptionRate", RAY);
