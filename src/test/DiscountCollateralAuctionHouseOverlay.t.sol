@@ -2,14 +2,14 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {FixedDiscountCollateralAuctionHouseOverlay} from "../overlays/FixedDiscountCollateralAuctionHouseOverlay.sol";
+import {DiscountCollateralAuctionHouseOverlay} from "../overlays/DiscountCollateralAuctionHouseOverlay.sol";
 
 contract User {
-    function doModifyParameters(FixedDiscountCollateralAuctionHouseOverlay overlay, bytes32 parameter, address addr) public {
+    function doModifyParameters(DiscountCollateralAuctionHouseOverlay overlay, bytes32 parameter, address addr) public {
         overlay.modifyParameters(parameter, addr);
     }
 }
-contract FixedDiscountCollateralAuctionHouse {
+contract DiscountCollateralAuctionHouse {
     address public systemCoinOracle;
 
     function modifyParameters(bytes32 parameter, address addr) public {
@@ -17,15 +17,15 @@ contract FixedDiscountCollateralAuctionHouse {
     }
 }
 
-contract FixedDiscountCollateralAuctionHouseOverlayTest is DSTest {
+contract DiscountCollateralAuctionHouseOverlayTest is DSTest {
     User user;
-    FixedDiscountCollateralAuctionHouse auctionHouse;
-    FixedDiscountCollateralAuctionHouseOverlay overlay;
+    DiscountCollateralAuctionHouse auctionHouse;
+    DiscountCollateralAuctionHouseOverlay overlay;
 
     function setUp() public {
         user         = new User();
-        auctionHouse = new FixedDiscountCollateralAuctionHouse();
-        overlay      = new FixedDiscountCollateralAuctionHouseOverlay(address(auctionHouse));
+        auctionHouse = new DiscountCollateralAuctionHouse();
+        overlay      = new DiscountCollateralAuctionHouseOverlay(address(auctionHouse));
     }
 
     function test_setup() public {
