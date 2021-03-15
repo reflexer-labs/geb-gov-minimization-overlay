@@ -13,6 +13,11 @@ contract AccountingEngineOverlay is GebAuth {
         accountingEngine = AccountingEngineLike(accountingEngine_);
     }
 
+    /*
+    * @notice Modify the systemStakingPool address inside the AccountingEngine
+    * @param parameter Must be "systemStakingPool"
+    * @param data The new address for the systemStakingPool
+    */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         if (parameter == "systemStakingPool") {
           accountingEngine.modifyParameters(parameter, data);

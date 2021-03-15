@@ -18,6 +18,11 @@ contract DebtAuctionInitialParameterSetterOverlay is GebAuth {
         assembly{ z := or(x, y)}
     }
 
+    /*
+    * @notify Change the address of the protocolTokenOrcl or systemCoinOrcl inside the debtAuctionParamSetter
+    * @param parameter Must be "protocolTokenOrcl" or "systemCoinOrcl"
+    * @param data The new address for the protocolTokenOrcl or the systemCoinOrcl
+    */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         if (either(parameter == "protocolTokenOrcl", parameter == "systemCoinOrcl")) {
             debtAuctionParamSetter.modifyParameters(parameter, data);

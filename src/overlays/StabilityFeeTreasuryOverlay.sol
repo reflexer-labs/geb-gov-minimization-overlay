@@ -13,6 +13,11 @@ contract StabilityFeeTreasuryOverlay is GebAuth {
         treasury = StabilityFeeTreasuryLike(treasury_);
     }
 
+    /*
+    * @notify Call the treasury so it can take funds from another address
+    * @param account The address that the treasury should take funds from
+    * @amount The amount of funds the treasury should take from the account
+    */
     function takeFunds(address account, uint256 amount) external isAuthorized {
         treasury.takeFunds(account, amount);
     }

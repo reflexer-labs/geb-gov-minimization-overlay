@@ -13,6 +13,11 @@ contract RateSetterOverlay is GebAuth {
         rateSetter = RateSetterLike(rateSetter_);
     }
 
+    /*
+    * @notify Change the orcl address inside the rate setter
+    * @param parameter Must be "orcl"
+    * @param data The new address for the orcl
+    */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         require(parameter == "orcl", "RateSetterOverlay/modify-forbidden-param");
         rateSetter.modifyParameters(parameter, data);

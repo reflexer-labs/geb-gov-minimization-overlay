@@ -18,6 +18,11 @@ contract DebtCeilingSetterOverlay is GebAuth {
         assembly{ z := or(x, y)}
     }
 
+    /*
+    * @notify Modify the blockIncreaseWhenRevalue or blockDecreaseWhenDevalue value inside the ceiling setter
+    * @param parameter Must be "blockIncreaseWhenRevalue" or "blockDecreaseWhenDevalue"
+    * @param data The new value for blockIncreaseWhenRevalue or blockDecreaseWhenDevalue
+    */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
         if (either(parameter == "blockIncreaseWhenRevalue", parameter == "blockDecreaseWhenDevalue")) {
           ceilingSetter.modifyParameters(parameter, data);

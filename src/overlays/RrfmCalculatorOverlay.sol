@@ -65,6 +65,11 @@ contract RrfmCalculatorOverlay is GebAuth {
         assembly{ z := or(x, y)}
     }
 
+    /*
+    * @notify Modify a uint256 param inside the calculator
+    * @param parameter The parameter's name
+    * @param val The new value for the parameter
+    */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         UnsignedBounds memory bounds = unsignedBounds[parameter];
 
@@ -78,6 +83,11 @@ contract RrfmCalculatorOverlay is GebAuth {
         else revert("RrfmCalculatorOverlay/modify-forbidden-param");
     }
 
+    /*
+    * @notify Modify a int256 param inside the calculator
+    * @param parameter The parameter's name
+    * @param val The new value for the parameter
+    */
     function modifyParameters(bytes32 parameter, int256 val) external isAuthorized {
         SignedBounds memory bounds = signedBounds[parameter];
 
