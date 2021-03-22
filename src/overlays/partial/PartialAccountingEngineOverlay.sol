@@ -22,6 +22,11 @@ contract PartialAccountingEngineOverlay is GebAuth {
     }
 
     // --- Core Logic ---
+    /**
+     * @notice Modify an uint256 param aside from lastSurplusAuctionTime and extraSurplusIsTransferred
+     * @param parameter The name of the parameter modified
+     * @param data New value for the parameter
+     */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         require(
           both(parameter != "lastSurplusAuctionTime", parameter != "extraSurplusIsTransferred"),
@@ -29,7 +34,11 @@ contract PartialAccountingEngineOverlay is GebAuth {
         );
         accountingEngine.modifyParameters(parameter, val);
     }
-
+    /**
+     * @notice Modify an address param aside from postSettlementSurplusDrain, protocolTokenAuthority. surplusAuctionHouse, debtAuctionHouse
+     * @param parameter The name of the parameter
+     * @param data New address for the parameter
+     */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         require(
           both(

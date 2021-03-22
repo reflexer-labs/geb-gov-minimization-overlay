@@ -23,18 +23,26 @@ contract PartialGlobalSettlementOverlay is GebAuth {
     }
 
     // --- Core Logic ---
+    /*
+    * @notify Modify the address of the stabilityFeeTreasury
+    * @param parameter Must be "stabilityFeeTreasury"
+    * @param data The new address for the stabilityFeeTreasury
+    */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
-        require(either(
-          either(parameter == "oracleRelayer", parameter == "coinSavingsAccount"),
-          parameter == "stabilityFeeTreasury"
-        ), "PartialGlobalSettlementOverlay/forbidden-param");
+        require(parameter == "stabilityFeeTreasury", "PartialGlobalSettlementOverlay/forbidden-param");
         globalSettlement.modifyParameters(parameter, data);
     }
-
+    /*
+    * @notify Modify an uint256 parameter
+    * @param parameter The name of the parameter to modify
+    * @param data The new value for the parameter
+    */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         globalSettlement.modifyParameters(parameter, val);
     }
-
+    /**
+     * @notice Freeze the system and start the cooldown period
+     */
     function shutdownSystem() external isAuthorized {
         globalSettlement.shutdownSystem();
     }
