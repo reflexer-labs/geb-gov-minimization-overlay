@@ -1,6 +1,6 @@
 pragma solidity 0.6.7;
 
-import "../auth/GebAuth.sol";
+import "../../auth/GebAuth.sol";
 
 abstract contract OracleRelayerLike {
     function modifyParameters(bytes32, uint256) virtual external;

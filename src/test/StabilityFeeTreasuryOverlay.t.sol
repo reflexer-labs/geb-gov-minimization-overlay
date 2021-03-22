@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../overlays/StabilityFeeTreasuryOverlay.sol";
+import "../overlays/minimal/StabilityFeeTreasuryOverlay.sol";
 
 contract User {
     function doTakeFunds(StabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {

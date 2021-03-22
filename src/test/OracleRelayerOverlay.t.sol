@@ -5,7 +5,7 @@ import "ds-test/test.sol";
 import "geb/OracleRelayer.sol";
 import "geb/SAFEEngine.sol";
 
-import "../overlays/OracleRelayerOverlay.sol";
+import "../overlays/minimal/OracleRelayerOverlay.sol";
 
 contract User {
     function doRestartRedemptionRate(OracleRelayerOverlay overlay) external {

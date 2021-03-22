@@ -1,0 +1,11 @@
+Overlays for partner systems
+
+- Safe engine: forbid changing any authed address without going through another overlay contract that only allows adding/removing collateral from the system
+- Accounting engine: forbid changing protocolTokenAuthority, debtAuctionHouse or surplusAuctionHouse; forbid removing specific authed addresses (liquidation engine, debt auction house, global settlement)
+- Liquidation engine: forbid changing the acocunting engine; forbid removing specific authed addresses (global settlement)
+- Debt auction house: forbid changing the protocolToken or removing the auth for accounting engine
+- Surplus auction house: forbid changing protocolToken or removing the auth for accounting engine
+- Global settlement: forbid changing liquidation engine, accounting engine or safe engine
+- Tax collector: forbid changing the primary tax receiver, bound the % of SF allocated to the primary receiver for every collateral type
+
+Separate from these, all safeEngine references in other contracts must be frozen

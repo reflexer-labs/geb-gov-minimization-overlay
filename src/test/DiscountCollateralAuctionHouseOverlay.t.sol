@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {DiscountCollateralAuctionHouseOverlay} from "../overlays/DiscountCollateralAuctionHouseOverlay.sol";
+import {DiscountCollateralAuctionHouseOverlay} from "../overlays/minimal/DiscountCollateralAuctionHouseOverlay.sol";
 
 contract User {
     function doModifyParameters(DiscountCollateralAuctionHouseOverlay overlay, bytes32 parameter, address addr) public {

@@ -3,7 +3,7 @@ pragma solidity 0.6.7;
 import "ds-test/test.sol";
 
 import "geb/AccountingEngine.sol";
-import "../overlays/AccountingEngineOverlay.sol";
+import "../overlays/minimal/AccountingEngineOverlay.sol";
 
 contract SimpleStakingPool {
     function canPrintProtocolTokens() public view returns (bool) {

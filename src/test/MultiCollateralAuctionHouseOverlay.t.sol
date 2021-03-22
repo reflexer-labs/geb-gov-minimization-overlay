@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../overlays/MultiCollateralAuctionHouseOverlay.sol";
+import "../overlays/minimal/MultiCollateralAuctionHouseOverlay.sol";
 
 contract User {
     function doModifyParameters(MultiCollateralAuctionHouseOverlay overlay, address auctionHouse, bytes32 parameter, address addr) public {

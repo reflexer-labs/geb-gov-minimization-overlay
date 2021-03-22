@@ -4,7 +4,7 @@ import "ds-test/test.sol";
 
 import "geb/LiquidationEngine.sol";
 
-import "../overlays/LiquidationEngineOverlay.sol";
+import "../overlays/minimal/LiquidationEngineOverlay.sol";
 
 contract SimpleSAFEEngine {
     function approveSAFEModification(address account) external {}

@@ -1,6 +1,6 @@
 pragma solidity 0.6.7;
 
-import "../auth/GebAuth.sol";
+import "../../auth/GebAuth.sol";
 
 abstract contract StabilityFeeTreasuryLike {
     function takeFunds(address, uint256) virtual external;

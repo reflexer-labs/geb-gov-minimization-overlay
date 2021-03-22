@@ -1,7 +1,7 @@
 pragma solidity 0.6.7;
 
 contract GebAuth {
-    // --- Authorities ---
+    // --- Authorization ---
     mapping (address => uint) public authorizedAccounts;
     /**
      * @notice Add auth to an account
