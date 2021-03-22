@@ -20,7 +20,7 @@ contract PartialSurplusAuctionHouseOverlay is GebAuth {
     /**
      * @notice Modify auction parameters
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         surplusAuctionHouse.modifyParameters(parameter, val);
@@ -28,7 +28,7 @@ contract PartialSurplusAuctionHouseOverlay is GebAuth {
     /**
      * @notice Modify address parameters
      * @param parameter The name of the parameter modified
-     * @param addr New address value
+     * @param data New address value
      */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         surplusAuctionHouse.modifyParameters(parameter, data);

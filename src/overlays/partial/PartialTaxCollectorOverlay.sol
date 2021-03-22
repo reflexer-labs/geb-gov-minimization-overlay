@@ -46,7 +46,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @notice Modify collateral specific uint256 params
      * @param collateralType Collateral type who's parameter is modified
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 collateralType, bytes32 parameter, uint256 val) external {
         taxCollector.modifyParameters(collateralType, parameter, val);
@@ -54,7 +54,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
     /**
      * @notice Modify general uint256 params
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 parameter, uint256 val) external {
         taxCollector.modifyParameters(parameter, val);

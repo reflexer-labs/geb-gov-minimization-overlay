@@ -35,7 +35,7 @@ contract PartialGlobalSettlementOverlay is GebAuth {
     /*
     * @notify Modify an uint256 parameter
     * @param parameter The name of the parameter to modify
-    * @param data The new value for the parameter
+    * @param val The new value for the parameter
     */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         globalSettlement.modifyParameters(parameter, val);

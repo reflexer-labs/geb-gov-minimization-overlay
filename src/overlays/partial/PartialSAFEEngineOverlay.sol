@@ -61,7 +61,7 @@ contract PartialSAFEEngineOverlay is GebAuth {
     /**
      * @notice Modify general uint256 params
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         safeEngine.modifyParameters(parameter, val);
@@ -70,7 +70,7 @@ contract PartialSAFEEngineOverlay is GebAuth {
      * @notice Modify collateral specific params
      * @param collateralType Collateral type we modify params for
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 collateralType, bytes32 parameter, uint256 val) external isAuthorized {
         safeEngine.modifyParameters(collateralType, parameter, val);

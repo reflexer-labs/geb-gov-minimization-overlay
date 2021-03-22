@@ -25,7 +25,7 @@ contract PartialAccountingEngineOverlay is GebAuth {
     /**
      * @notice Modify an uint256 param aside from lastSurplusAuctionTime and extraSurplusIsTransferred
      * @param parameter The name of the parameter modified
-     * @param data New value for the parameter
+     * @param val New value for the parameter
      */
     function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         require(
