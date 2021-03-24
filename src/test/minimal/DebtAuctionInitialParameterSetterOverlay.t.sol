@@ -33,6 +33,15 @@ contract DebtAuctionInitialParameterSetterOverlayTest is DSTest {
     function test_setup() public {
         assertEq(address(overlay.debtAuctionParamSetter()), address(setter));
     }
+    function test_add_auth() public {
+        overlay.addAuthorization(address(0x3));
+        assertEq(overlay.authorizedAccounts(address(0x3)), 1);
+    }
+    function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
+        overlay.removeAuthorization(address(this));
+        assertEq(overlay.authorizedAccounts(address(this)), 0);
+    }
     function test_set_prot_oracle() public {
         overlay.modifyParameters("protocolTokenOrcl", address(0x1));
         assertEq(setter.protocolTokenOrcl(), address(0x1));

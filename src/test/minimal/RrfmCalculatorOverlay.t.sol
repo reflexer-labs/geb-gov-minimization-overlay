@@ -102,6 +102,15 @@ contract RrfmCalculatorOverlayTest is DSTest {
         assertEq(unsignedUpperBound, uint(RAY + 5));
         assertEq(unsignedLowerBound, uint(RAY - 10));
     }
+    function test_add_auth() public {
+        overlay.addAuthorization(address(0x3));
+        assertEq(overlay.authorizedAccounts(address(0x3)), 1);
+    }
+    function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
+        overlay.removeAuthorization(address(this));
+        assertEq(overlay.authorizedAccounts(address(this)), 0);
+    }
     function test_set_allReaderToggle() public {
         assertEq(calculator.allReaderToggle(), uint(0));
         overlay.modifyParameters("allReaderToggle", uint(1000));

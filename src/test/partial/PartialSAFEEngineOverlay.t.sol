@@ -67,6 +67,7 @@ contract PartialSAFEEngineOverlayTest is DSTest {
         assertEq(overlay.authorizedAccounts(address(0x3)), 1);
     }
     function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
         overlay.removeAuthorization(address(this));
         assertEq(overlay.authorizedAccounts(address(this)), 0);
     }

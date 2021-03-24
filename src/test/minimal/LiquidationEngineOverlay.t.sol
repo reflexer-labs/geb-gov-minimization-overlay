@@ -56,6 +56,15 @@ contract LiquidationEngineOverlayTest is DSTest {
     function test_setup() public {
         assertEq(address(overlay.liquidationEngine()), address(liquidationEngine));
     }
+    function test_add_auth() public {
+        overlay.addAuthorization(address(0x3));
+        assertEq(overlay.authorizedAccounts(address(0x3)), 1);
+    }
+    function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
+        overlay.removeAuthorization(address(this));
+        assertEq(overlay.authorizedAccounts(address(this)), 0);
+    }
     function test_connect_saviour() public {
         overlay.connectSAFESaviour(address(saviour));
         assertEq(liquidationEngine.safeSaviours(address(saviour)), 1);

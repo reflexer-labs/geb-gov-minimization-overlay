@@ -39,6 +39,15 @@ contract AccountingEngineOverlayTest is DSTest {
     function test_setup() public {
         assertEq(address(overlay.accountingEngine()), address(accountingEngine));
     }
+    function test_add_auth() public {
+        overlay.addAuthorization(address(0x3));
+        assertEq(overlay.authorizedAccounts(address(0x3)), 1);
+    }
+    function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
+        overlay.removeAuthorization(address(this));
+        assertEq(overlay.authorizedAccounts(address(this)), 0);
+    }
     function test_set_staking_pool() public {
         overlay.modifyParameters("systemStakingPool", address(staking));
         assertEq(address(accountingEngine.systemStakingPool()), address(staking));

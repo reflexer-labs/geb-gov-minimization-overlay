@@ -51,6 +51,15 @@ contract TaxCollectorOverlayTest is DSTest {
     function test_setup() public {
         assertEq(address(overlay.taxCollector()), address(taxCollector));
     }
+    function test_add_auth() public {
+        overlay.addAuthorization(address(0x3));
+        assertEq(overlay.authorizedAccounts(address(0x3)), 1);
+    }
+    function test_remove_auth() public {
+        overlay.addAuthorization(address(this));
+        overlay.removeAuthorization(address(this));
+        assertEq(overlay.authorizedAccounts(address(this)), 0);
+    }
     function test_set_sf_first_collateral() public {
         overlay.modifyParameters("ETH-A", "stabilityFee", RAY + 4);
         (uint256 stabilityFee, ) = taxCollector.collateralTypes("ETH-A");
