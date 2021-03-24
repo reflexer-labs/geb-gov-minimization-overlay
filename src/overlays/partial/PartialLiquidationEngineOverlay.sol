@@ -53,7 +53,7 @@ contract PartialLiquidationEngineOverlay is GebAuth {
         liquidationEngine.modifyParameters(collateralType, parameter, val);
     }
     /**
-     * @notice Modify collateral auction address
+     * @notice Modify collateral auction house addresses
      * @param collateralType The collateral type we change parameters for
      * @param parameter The name of the integration modified
      * @param data New address for the integration contract

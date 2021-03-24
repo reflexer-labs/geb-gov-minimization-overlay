@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {DebtAuctionInitialParameterSetterOverlay} from "../overlays/minimal/DebtAuctionInitialParameterSetterOverlay.sol";
+import {DebtAuctionInitialParameterSetterOverlay} from "../../overlays/minimal/DebtAuctionInitialParameterSetterOverlay.sol";
 
 contract User {
     function doModifyParameters(DebtAuctionInitialParameterSetterOverlay overlay, bytes32 parameter, address addr) public {

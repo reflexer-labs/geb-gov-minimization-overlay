@@ -5,7 +5,7 @@ import "ds-test/test.sol";
 import "geb/TaxCollector.sol";
 import "geb/SAFEEngine.sol";
 
-import "../overlays/minimal/TaxCollectorOverlay.sol";
+import "../../overlays/minimal/TaxCollectorOverlay.sol";
 
 contract User {
     function doModifyParameters(

@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {DebtCeilingSetterOverlay} from "../overlays/minimal/DebtCeilingSetterOverlay.sol";
+import {DebtCeilingSetterOverlay} from "../../overlays/minimal/DebtCeilingSetterOverlay.sol";
 
 contract User {
     function doModifyParameters(DebtCeilingSetterOverlay overlay, bytes32 parameter, uint256 val) public {

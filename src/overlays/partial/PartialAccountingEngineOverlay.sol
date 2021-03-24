@@ -35,18 +35,12 @@ contract PartialAccountingEngineOverlay is GebAuth {
         accountingEngine.modifyParameters(parameter, val);
     }
     /**
-     * @notice Modify an address param aside from postSettlementSurplusDrain, protocolTokenAuthority. surplusAuctionHouse, debtAuctionHouse
-     * @param parameter The name of the parameter
+     * @notice Modify the systemStakingPool
+     * @param parameter Must be "systemStakingPool"
      * @param data New address for the parameter
      */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
-        require(
-          both(
-            both(parameter != "postSettlementSurplusDrain", parameter != "protocolTokenAuthority"),
-            both(parameter != "surplusAuctionHouse", parameter != "debtAuctionHouse")
-          ), "PartialAccountingEngineOverlay/forbidden-param"
-        );
-
+        require(parameter == "systemStakingPool", "PartialAccountingEngineOverlay/forbidden-param");
         accountingEngine.modifyParameters(parameter, data);
     }
 }
