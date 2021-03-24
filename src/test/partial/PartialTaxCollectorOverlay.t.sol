@@ -64,5 +64,62 @@ contract PartialAccountingEngineOverlayTest is DSTest {
         overlay.removeAuthorization(address(this));
         assertEq(overlay.authorizedAccounts(address(this)), 0);
     }
+    function test_initializeCollateralType() public {
+        overlay.initializeCollateralType("ETH-A");
+        (uint256 stabilityFee, ) = taxCollector.collateralTypes("ETH-A");
+        assertEq(stabilityFee, 1E27);
+    }
+    function testFail_initializeCollateralType_unauthed() public {
+        user.initializeCollateralType(overlay, "ETH-A");
+    }
+    function test_modifyParam_modifyParameters_collateral_uint() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("ETH-A", "stabilityFee", 1E27 + 1);
 
+        (uint256 stabilityFee, ) = taxCollector.collateralTypes("ETH-A");
+        assertEq(stabilityFee, 1E27 + 1);
+    }
+    function testFail_modifyParam_modifyParameters_collateral_uint() public {
+        overlay.initializeCollateralType("ETH-A");
+        user.modifyParameters(overlay, "ETH-A", "stabilityFee", 1E27 + 1);
+    }
+    function test_modifyParam_uint() public {
+        overlay.modifyParameters("globalStabilityFee", 1E27 + 5);
+        assertEq(taxCollector.globalStabilityFee(), 1E27 + 5);
+    }
+    function testFail_modifyParam_uint_unauthed() public {
+        user.modifyParameters(overlay, "globalStabilityFee", 1E27 + 5);
+    }
+    function test_modifyParam_negative_tax() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("maxSecondaryReceivers", 1);
+        overlay.modifyParameters("ETH-A", 10, taxCollector.WHOLE_TAX_CUT() / 10, address(0x1));
+        overlay.modifyParameters("ETH-A", 1, 1);
+
+        (uint canTakeBackTax, ) = taxCollector.secondaryTaxReceivers("ETH-A", 1);
+        assertEq(canTakeBackTax, 1);
+    }
+    function testFail_modifyParam_negative_tax_unauthed() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("maxSecondaryReceivers", 1);
+        overlay.modifyParameters("ETH-A", 10, taxCollector.WHOLE_TAX_CUT() / 10, address(0x1));
+        user.modifyParameters(overlay, "ETH-A", 1, 1);
+    }
+    function test_modifyParam_secondary_tax() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("maxSecondaryReceivers", 1);
+        overlay.modifyParameters("ETH-A", 10, taxCollector.WHOLE_TAX_CUT() / 10, address(0x1));
+
+        assertEq(taxCollector.usedSecondaryReceiver(address(0x1)), 1);
+    }
+    function testFail_modifyParam_secondary_tax_above_threshold() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("maxSecondaryReceivers", 1);
+        overlay.modifyParameters("ETH-A", 10, taxCollector.WHOLE_TAX_CUT() / 2, address(0x1));
+    }
+    function testFail_modifyParam_secondary_tax_unauthed() public {
+        overlay.initializeCollateralType("ETH-A");
+        overlay.modifyParameters("maxSecondaryReceivers", 1);
+        user.modifyParameters(overlay, "ETH-A", 10, taxCollector.WHOLE_TAX_CUT() / 10, address(0x1));
+    }
 }

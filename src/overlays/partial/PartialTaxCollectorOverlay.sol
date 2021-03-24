@@ -39,7 +39,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @notice Initialize a brand new collateral type
      * @param collateralType Collateral type name (e.g ETH-A, TBTC-B)
      */
-    function initializeCollateralType(bytes32 collateralType) external {
+    function initializeCollateralType(bytes32 collateralType) external isAuthorized {
         taxCollector.initializeCollateralType(collateralType);
     }
     /**
@@ -48,7 +48,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @param parameter The name of the parameter modified
      * @param val New value for the parameter
      */
-    function modifyParameters(bytes32 collateralType, bytes32 parameter, uint256 val) external {
+    function modifyParameters(bytes32 collateralType, bytes32 parameter, uint256 val) external isAuthorized {
         taxCollector.modifyParameters(collateralType, parameter, val);
     }
     /**
@@ -56,7 +56,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @param parameter The name of the parameter modified
      * @param val New value for the parameter
      */
-    function modifyParameters(bytes32 parameter, uint256 val) external {
+    function modifyParameters(bytes32 parameter, uint256 val) external isAuthorized {
         taxCollector.modifyParameters(parameter, val);
     }
     /**
@@ -65,7 +65,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @param position Receiver position in the list
      * @param val Value that specifies whether a tax receiver can incur negative rates
      */
-    function modifyParameters(bytes32 collateralType, uint256 position, uint256 val) external {
+    function modifyParameters(bytes32 collateralType, uint256 position, uint256 val) external isAuthorized {
         taxCollector.modifyParameters(collateralType, position, val);
     }
     /**
@@ -76,7 +76,7 @@ contract PartialTaxCollectorOverlay is GebAuth {
      * @param taxPercentage Percentage of SF offered to the tax receiver
      * @param receiverAccount Receiver address
      */
-    function modifyParameters(bytes32 collateralType, uint256 position, uint256 taxPercentage, address receiverAccount) external {
+    function modifyParameters(bytes32 collateralType, uint256 position, uint256 taxPercentage, address receiverAccount) external isAuthorized {
         taxCollector.modifyParameters(collateralType, position, taxPercentage, receiverAccount);
         require(
           taxCollector.secondaryReceiverAllotedTax(collateralType) <= secondaryReceiversMaxAllotedTax,
