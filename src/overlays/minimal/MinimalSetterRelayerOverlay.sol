@@ -5,11 +5,11 @@ import "../../auth/GebAuth.sol";
 abstract contract SetterRelayerLike {
     function modifyParameters(bytes32, address) virtual external;
 }
-contract SetterRelayerOverlay is GebAuth {
+contract MinimalSetterRelayerOverlay is GebAuth {
     SetterRelayerLike public relayer;
 
     constructor(address relayer_) public GebAuth() {
-        require(relayer_ != address(0), "SetterRelayerOverlay/null-address");
+        require(relayer_ != address(0), "MinimalSetterRelayerOverlay/null-address");
         relayer = SetterRelayerLike(relayer_);
     }
 
@@ -21,6 +21,6 @@ contract SetterRelayerOverlay is GebAuth {
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         if (parameter == "setter") {
           relayer.modifyParameters(parameter, data);
-        } else revert("SetterRelayerOverlay/modify-forbidden-param");
+        } else revert("MinimalSetterRelayerOverlay/modify-forbidden-param");
     }
 }

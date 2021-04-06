@@ -5,11 +5,11 @@ import "ds-test/test.sol";
 import "geb/TaxCollector.sol";
 import "geb/SAFEEngine.sol";
 
-import "../../overlays/minimal/TaxCollectorOverlay.sol";
+import "../../overlays/minimal/MinimalTaxCollectorOverlay.sol";
 
 contract User {
     function doModifyParameters(
-      TaxCollectorOverlay overlay,
+      MinimalTaxCollectorOverlay overlay,
       bytes32 collateralType,
       bytes32 parameter,
       uint256 data
@@ -18,11 +18,11 @@ contract User {
     }
 }
 
-contract TaxCollectorOverlayTest is DSTest {
+contract MinimalTaxCollectorOverlayTest is DSTest {
     User user;
     TaxCollector taxCollector;
     SAFEEngine safeEngine;
-    TaxCollectorOverlay overlay;
+    MinimalTaxCollectorOverlay overlay;
 
     // Vars
     uint256 constant RAY       = 10 ** 27;
@@ -35,7 +35,7 @@ contract TaxCollectorOverlayTest is DSTest {
         user = new User();
         safeEngine = new SAFEEngine();
         taxCollector = new TaxCollector(address(safeEngine));
-        overlay = new TaxCollectorOverlay(
+        overlay = new MinimalTaxCollectorOverlay(
           address(taxCollector),
           collateralTypes,
           lowerBounds,

@@ -2,13 +2,13 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../../overlays/minimal/RrfmCalculatorOverlay.sol";
+import "../../overlays/minimal/MinimalRrfmCalculatorOverlay.sol";
 
 contract User {
-    function doModifyParameters(RrfmCalculatorOverlay overlay, bytes32 parameter, uint256 val) external {
+    function doModifyParameters(MinimalRrfmCalculatorOverlay overlay, bytes32 parameter, uint256 val) external {
         overlay.modifyParameters(parameter, val);
     }
-    function doModifyParameters(RrfmCalculatorOverlay overlay, bytes32 parameter, int256 val) external {
+    function doModifyParameters(MinimalRrfmCalculatorOverlay overlay, bytes32 parameter, int256 val) external {
         overlay.modifyParameters(parameter, val);
     }
 }
@@ -47,10 +47,10 @@ contract Calculator {
     }
 }
 
-contract RrfmCalculatorOverlayTest is DSTest {
+contract MinimalRrfmCalculatorOverlayTest is DSTest {
     User user;
     Calculator calculator;
-    RrfmCalculatorOverlay overlay;
+    MinimalRrfmCalculatorOverlay overlay;
 
     // Constants
     uint256 WAD = 10 ** 18;
@@ -68,7 +68,7 @@ contract RrfmCalculatorOverlayTest is DSTest {
         user = new User();
         calculator = new Calculator();
 
-        overlay = new RrfmCalculatorOverlay(
+        overlay = new MinimalRrfmCalculatorOverlay(
             address(calculator),
             unsignedParams,
             signedParams,

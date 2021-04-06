@@ -5,21 +5,21 @@ import "ds-test/test.sol";
 import "geb/OracleRelayer.sol";
 import "geb/SAFEEngine.sol";
 
-import "../../overlays/minimal/OracleRelayerOverlay.sol";
+import "../../overlays/minimal/MinimalOracleRelayerOverlay.sol";
 
 contract User {
-    function doRestartRedemptionRate(OracleRelayerOverlay overlay) external {
+    function doRestartRedemptionRate(MinimalOracleRelayerOverlay overlay) external {
         overlay.restartRedemptionRate();
     }
 }
 
-contract OracleRelayerOverlayTest is DSTest {
+contract MinimalOracleRelayerOverlayTest is DSTest {
     User user;
 
     SAFEEngine safeEngine;
     OracleRelayer oracleRelayer;
 
-    OracleRelayerOverlay overlay;
+    MinimalOracleRelayerOverlay overlay;
 
     uint256 startingRedemptionRate = 10 ** 27 + 50;
 
@@ -27,7 +27,7 @@ contract OracleRelayerOverlayTest is DSTest {
         user          = new User();
         safeEngine    = new SAFEEngine();
         oracleRelayer = new OracleRelayer(address(safeEngine));
-        overlay       = new OracleRelayerOverlay(address(oracleRelayer));
+        overlay       = new MinimalOracleRelayerOverlay(address(oracleRelayer));
 
         oracleRelayer.modifyParameters("redemptionRate", startingRedemptionRate);
         oracleRelayer.addAuthorization(address(overlay));

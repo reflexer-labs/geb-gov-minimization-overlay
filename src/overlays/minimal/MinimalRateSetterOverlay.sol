@@ -5,11 +5,11 @@ import "../../auth/GebAuth.sol";
 abstract contract RateSetterLike {
     function modifyParameters(bytes32, address) virtual external;
 }
-contract RateSetterOverlay is GebAuth {
+contract MinimalRateSetterOverlay is GebAuth {
     RateSetterLike public rateSetter;
 
     constructor(address rateSetter_) public {
-        require(rateSetter_ != address(0), "RateSetterOverlay/null-address");
+        require(rateSetter_ != address(0), "MinimalRateSetterOverlay/null-address");
         rateSetter = RateSetterLike(rateSetter_);
     }
 
@@ -19,7 +19,7 @@ contract RateSetterOverlay is GebAuth {
     * @param data The new address for the orcl
     */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
-        require(parameter == "orcl", "RateSetterOverlay/modify-forbidden-param");
+        require(parameter == "orcl", "MinimalRateSetterOverlay/modify-forbidden-param");
         rateSetter.modifyParameters(parameter, data);
     }
 }

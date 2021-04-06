@@ -5,11 +5,11 @@ import "../../auth/GebAuth.sol";
 abstract contract StabilityFeeTreasuryLike {
     function takeFunds(address, uint256) virtual external;
 }
-contract StabilityFeeTreasuryOverlay is GebAuth {
+contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
     StabilityFeeTreasuryLike public treasury;
 
     constructor(address treasury_) public GebAuth() {
-        require(treasury_ != address(0), "StabilityFeeTreasuryOverlay/null-address");
+        require(treasury_ != address(0), "MinimalStabilityFeeTreasuryOverlay/null-address");
         treasury = StabilityFeeTreasuryLike(treasury_);
     }
 

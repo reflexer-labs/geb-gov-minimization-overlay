@@ -5,11 +5,11 @@ import "../../auth/GebAuth.sol";
 abstract contract DebtAuctionInitialParameterSetterLike {
     function modifyParameters(bytes32, address) virtual external;
 }
-contract DebtAuctionInitialParameterSetterOverlay is GebAuth {
+contract MinimalDebtAuctionInitialParameterSetterOverlay is GebAuth {
     DebtAuctionInitialParameterSetterLike public debtAuctionParamSetter;
 
     constructor(address debtAuctionParamSetter_) public GebAuth() {
-        require(debtAuctionParamSetter_ != address(0), "DebtAuctionInitialParameterSetterOverlay/null-address");
+        require(debtAuctionParamSetter_ != address(0), "MinimalDebtAuctionInitialParameterSetterOverlay/null-address");
         debtAuctionParamSetter = DebtAuctionInitialParameterSetterLike(debtAuctionParamSetter_);
     }
 
@@ -27,6 +27,6 @@ contract DebtAuctionInitialParameterSetterOverlay is GebAuth {
         if (either(parameter == "protocolTokenOrcl", parameter == "systemCoinOrcl")) {
             debtAuctionParamSetter.modifyParameters(parameter, data);
         }
-        else revert("DebtAuctionInitialParameterSetterOverlay/modify-forbidden-param");
+        else revert("MinimalDebtAuctionInitialParameterSetterOverlay/modify-forbidden-param");
     }
 }

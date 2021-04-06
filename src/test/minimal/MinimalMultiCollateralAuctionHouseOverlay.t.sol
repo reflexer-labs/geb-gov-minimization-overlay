@@ -2,10 +2,10 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../../overlays/minimal/MultiCollateralAuctionHouseOverlay.sol";
+import "../../overlays/minimal/MinimalMultiCollateralAuctionHouseOverlay.sol";
 
 contract User {
-    function doModifyParameters(MultiCollateralAuctionHouseOverlay overlay, address auctionHouse, bytes32 parameter, address addr) public {
+    function doModifyParameters(MinimalMultiCollateralAuctionHouseOverlay overlay, address auctionHouse, bytes32 parameter, address addr) public {
         overlay.modifyParameters(auctionHouse, parameter, addr);
     }
 }
@@ -17,17 +17,17 @@ contract FixedDiscountCollateralAuctionHouse {
     }
 }
 
-contract MultiCollateralAuctionHouseOverlayTest is DSTest {
+contract MinimalMultiCollateralAuctionHouseOverlayTest is DSTest {
     User user;
     FixedDiscountCollateralAuctionHouse auctionHouseOne;
     FixedDiscountCollateralAuctionHouse auctionHouseTwo;
-    MultiCollateralAuctionHouseOverlay overlay;
+    MinimalMultiCollateralAuctionHouseOverlay overlay;
 
     function setUp() public {
         user            = new User();
         auctionHouseOne = new FixedDiscountCollateralAuctionHouse();
         auctionHouseTwo = new FixedDiscountCollateralAuctionHouse();
-        overlay         = new MultiCollateralAuctionHouseOverlay();
+        overlay         = new MinimalMultiCollateralAuctionHouseOverlay();
     }
 
     function test_add_auth() public {

@@ -2,10 +2,10 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {DebtAuctionInitialParameterSetterOverlay} from "../../overlays/minimal/DebtAuctionInitialParameterSetterOverlay.sol";
+import {MinimalDebtAuctionInitialParameterSetterOverlay} from "../../overlays/minimal/MinimalDebtAuctionInitialParameterSetterOverlay.sol";
 
 contract User {
-    function doModifyParameters(DebtAuctionInitialParameterSetterOverlay overlay, bytes32 parameter, address addr) public {
+    function doModifyParameters(MinimalDebtAuctionInitialParameterSetterOverlay overlay, bytes32 parameter, address addr) public {
         overlay.modifyParameters(parameter, addr);
     }
 }
@@ -19,15 +19,15 @@ contract DebtAuctionInitialParameterSetter {
     }
 }
 
-contract DebtAuctionInitialParameterSetterOverlayTest is DSTest {
+contract MinimalDebtAuctionInitialParameterSetterOverlayTest is DSTest {
     User user;
     DebtAuctionInitialParameterSetter setter;
-    DebtAuctionInitialParameterSetterOverlay overlay;
+    MinimalDebtAuctionInitialParameterSetterOverlay overlay;
 
     function setUp() public {
         user     = new User();
         setter   = new DebtAuctionInitialParameterSetter();
-        overlay  = new DebtAuctionInitialParameterSetterOverlay(address(setter));
+        overlay  = new MinimalDebtAuctionInitialParameterSetterOverlay(address(setter));
     }
 
     function test_setup() public {

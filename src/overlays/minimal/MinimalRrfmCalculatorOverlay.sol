@@ -6,7 +6,7 @@ abstract contract RrfmCalculatorLike {
     function modifyParameters(bytes32, uint256) virtual external;
     function modifyParameters(bytes32, int256) virtual external;
 }
-contract RrfmCalculatorOverlay is GebAuth {
+contract MinimalRrfmCalculatorOverlay is GebAuth {
     // --- Vars ---
     mapping(bytes32 => UnsignedBounds) public unsignedBounds;
     mapping(bytes32 => SignedBounds)   public signedBounds;
@@ -34,23 +34,23 @@ contract RrfmCalculatorOverlay is GebAuth {
     ) public {
         require(
           both(unsignedParams.length == unsignedUpperBounds.length, unsignedParams.length == unsignedLowerBounds.length),
-          "RrfmCalculatorOverlay/invalid-unsigned-lengths"
+          "MinimalRrfmCalculatorOverlay/invalid-unsigned-lengths"
         );
         require(
           both(signedParams.length == signedUpperBounds.length, signedParams.length == signedLowerBounds.length),
-          "RrfmCalculatorOverlay/invalid-signed-lengths"
+          "MinimalRrfmCalculatorOverlay/invalid-signed-lengths"
         );
-        require(calculator_ != address(0), "RrfmCalculatorOverlay/null-calculator");
+        require(calculator_ != address(0), "MinimalRrfmCalculatorOverlay/null-calculator");
 
         uint256 i;
         for (i = 0; i < unsignedParams.length; i++) {
-            require(either(unsignedUpperBounds[i] != 0, unsignedLowerBounds[i] != 0), "RrfmCalculatorOverlay/invalid-uint-bounds");
-            require(unsignedUpperBounds[i] >= unsignedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-uint-bounds");
+            require(either(unsignedUpperBounds[i] != 0, unsignedLowerBounds[i] != 0), "MinimalRrfmCalculatorOverlay/invalid-uint-bounds");
+            require(unsignedUpperBounds[i] >= unsignedLowerBounds[i], "MinimalRrfmCalculatorOverlay/incorrect-uint-bounds");
             unsignedBounds[unsignedParams[i]] = UnsignedBounds(unsignedUpperBounds[i], unsignedLowerBounds[i]);
         }
         for (i = 0; i < signedParams.length; i++) {
-            require(either(signedUpperBounds[i] != 0, signedLowerBounds[i] != 0), "RrfmCalculatorOverlay/invalid-int-bounds");
-            require(signedUpperBounds[i] >= signedLowerBounds[i], "RrfmCalculatorOverlay/incorrect-int-bounds");
+            require(either(signedUpperBounds[i] != 0, signedLowerBounds[i] != 0), "MinimalRrfmCalculatorOverlay/invalid-int-bounds");
+            require(signedUpperBounds[i] >= signedLowerBounds[i], "MinimalRrfmCalculatorOverlay/incorrect-int-bounds");
             signedBounds[signedParams[i]] = SignedBounds(signedUpperBounds[i], signedLowerBounds[i]);
         }
 
@@ -77,10 +77,10 @@ contract RrfmCalculatorOverlay is GebAuth {
             calculator.modifyParameters(parameter, uint(1));
         }
         else if (either(bounds.upperBound != 0, bounds.lowerBound != 0)) {
-            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "RrfmCalculatorOverlay/invalid-value");
+            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
             calculator.modifyParameters(parameter, val);
         }
-        else revert("RrfmCalculatorOverlay/modify-forbidden-param");
+        else revert("MinimalRrfmCalculatorOverlay/modify-forbidden-param");
     }
 
     /*
@@ -95,9 +95,9 @@ contract RrfmCalculatorOverlay is GebAuth {
             calculator.modifyParameters(parameter, int(0));
         }
         else if (either(bounds.upperBound != 0, bounds.lowerBound != 0)) {
-            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "RrfmCalculatorOverlay/invalid-value");
+            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
             calculator.modifyParameters(parameter, val);
         }
-        else revert("RrfmCalculatorOverlay/modify-forbidden-param");
+        else revert("MinimalRrfmCalculatorOverlay/modify-forbidden-param");
     }
 }

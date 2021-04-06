@@ -5,11 +5,11 @@ import "../../auth/GebAuth.sol";
 abstract contract DebtCeilingSetterLike {
     function modifyParameters(bytes32, uint256) virtual external;
 }
-contract DebtCeilingSetterOverlay is GebAuth {
+contract MinimalDebtCeilingSetterOverlay is GebAuth {
     DebtCeilingSetterLike public ceilingSetter;
 
     constructor(address ceilingSetter_) public GebAuth() {
-        require(ceilingSetter_ != address(0), "DebtCeilingSetterOverlay/null-address");
+        require(ceilingSetter_ != address(0), "MinimalDebtCeilingSetterOverlay/null-address");
         ceilingSetter = DebtCeilingSetterLike(ceilingSetter_);
     }
 
@@ -26,6 +26,6 @@ contract DebtCeilingSetterOverlay is GebAuth {
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
         if (either(parameter == "blockIncreaseWhenRevalue", parameter == "blockDecreaseWhenDevalue")) {
           ceilingSetter.modifyParameters(parameter, data);
-        } else revert("DebtCeilingSetterOverlay/modify-forbidden-param");
+        } else revert("MinimalDebtCeilingSetterOverlay/modify-forbidden-param");
     }
 }

@@ -10,7 +10,7 @@ abstract contract TaxCollectorLike {
     ) virtual external;
     function taxSingle(bytes32) virtual public returns (uint256);
 }
-contract TaxCollectorOverlay is GebAuth {
+contract MinimalTaxCollectorOverlay is GebAuth {
     // --- Variables ---
     // Stability fee bounds for every collateral type
     mapping(bytes32 => Bounds) public stabilityFeeBounds;
@@ -30,9 +30,9 @@ contract TaxCollectorOverlay is GebAuth {
       uint256[] memory lowerBounds,
       uint256[] memory upperBounds
     ) public {
-        require(taxCollector_ != address(0), "TaxCollectorOverlay/null-address");
-        require(both(collateralTypes.length == lowerBounds.length, lowerBounds.length == upperBounds.length), "TaxCollectorOverlay/invalid-array-lengths");
-        require(collateralTypes.length > 0, "TaxCollectorOverlay/null-array-lengths");
+        require(taxCollector_ != address(0), "MinimalTaxCollectorOverlay/null-address");
+        require(both(collateralTypes.length == lowerBounds.length, lowerBounds.length == upperBounds.length), "MinimalTaxCollectorOverlay/invalid-array-lengths");
+        require(collateralTypes.length > 0, "MinimalTaxCollectorOverlay/null-array-lengths");
 
         taxCollector = TaxCollectorLike(taxCollector_);
 
@@ -41,10 +41,10 @@ contract TaxCollectorOverlay is GebAuth {
             // Make sure we don't set bounds for the same collateral type twice
             require(
               both(stabilityFeeBounds[collateralTypes[i]].upperBound == 0, stabilityFeeBounds[collateralTypes[i]].lowerBound == 0),
-              "TaxCollectorOverlay/bounds/already-set"
+              "MinimalTaxCollectorOverlay/bounds/already-set"
             );
             // Make sure the lower bound is not negative and the upper bound is >= the lower bound
-            require(both(lowerBounds[i] >= RAY, upperBounds[i] >= lowerBounds[i]), "TaxCollectorOverlay/invalid-bounds");
+            require(both(lowerBounds[i] >= RAY, upperBounds[i] >= lowerBounds[i]), "MinimalTaxCollectorOverlay/invalid-bounds");
             stabilityFeeBounds[collateralTypes[i]] = Bounds(upperBounds[i], lowerBounds[i]);
         }
     }
@@ -74,12 +74,12 @@ contract TaxCollectorOverlay is GebAuth {
         // Check that the collateral type has bounds
         require(
           both(upperBound >= lowerBound, lowerBound >= RAY),
-          "TaxCollectorOverlay/bounds-improperly-set"
+          "MinimalTaxCollectorOverlay/bounds-improperly-set"
         );
         // Check that the new fee is within bounds
-        require(both(data <= upperBound, data >= lowerBound), "TaxCollectorOverlay/fee-exceeds-bounds");
+        require(both(data <= upperBound, data >= lowerBound), "MinimalTaxCollectorOverlay/fee-exceeds-bounds");
         // Check that the parameter name is correct
-        require(parameter == "stabilityFee", "TaxCollectorOverlay/invalid-parameter");
+        require(parameter == "stabilityFee", "MinimalTaxCollectorOverlay/invalid-parameter");
         // Collect the fee up until now
         taxCollector.taxSingle(collateralType);
         // Finally set the new fee

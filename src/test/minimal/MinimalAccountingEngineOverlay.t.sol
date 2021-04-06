@@ -3,7 +3,7 @@ pragma solidity 0.6.7;
 import "ds-test/test.sol";
 
 import "geb/AccountingEngine.sol";
-import "../../overlays/minimal/AccountingEngineOverlay.sol";
+import "../../overlays/minimal/MinimalAccountingEngineOverlay.sol";
 
 contract SimpleStakingPool {
     function canPrintProtocolTokens() public view returns (bool) {
@@ -11,7 +11,7 @@ contract SimpleStakingPool {
     }
 }
 contract User {
-    function doModifyParameters(AccountingEngineOverlay overlay, bytes32 parameter, address addr) public {
+    function doModifyParameters(MinimalAccountingEngineOverlay overlay, bytes32 parameter, address addr) public {
         overlay.modifyParameters(parameter, addr);
     }
 }
@@ -19,17 +19,17 @@ contract SimpleSAFEEngine {
     function approveSAFEModification(address account) external {}
 }
 
-contract AccountingEngineOverlayTest is DSTest {
+contract MinimalAccountingEngineOverlayTest is DSTest {
     AccountingEngine accountingEngine;
     SimpleStakingPool staking;
     SimpleSAFEEngine safeEngine;
-    AccountingEngineOverlay overlay;
+    MinimalAccountingEngineOverlay overlay;
     User user;
 
     function setUp() public {
         safeEngine       = new SimpleSAFEEngine();
         accountingEngine = new AccountingEngine(address(safeEngine), address(0x1), address(0x1));
-        overlay          = new AccountingEngineOverlay(address(accountingEngine));
+        overlay          = new MinimalAccountingEngineOverlay(address(accountingEngine));
         staking          = new SimpleStakingPool();
         user             = new User();
 

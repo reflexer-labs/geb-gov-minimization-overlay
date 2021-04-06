@@ -2,10 +2,10 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../../overlays/minimal/SetterRelayerOverlay.sol";
+import "../../overlays/minimal/MinimalSetterRelayerOverlay.sol";
 
 contract User {
-    function doModifyParameters(SetterRelayerOverlay overlay, bytes32 parameter, address addr) public {
+    function doModifyParameters(MinimalSetterRelayerOverlay overlay, bytes32 parameter, address addr) public {
         overlay.modifyParameters(parameter, addr);
     }
 }
@@ -17,15 +17,15 @@ contract SetterRelayer {
     }
 }
 
-contract SetterRelayerOverlayTest is DSTest {
+contract MinimalSetterRelayerOverlayTest is DSTest {
     User user;
-    SetterRelayerOverlay overlay;
+    MinimalSetterRelayerOverlay overlay;
     SetterRelayer relayer;
 
     function setUp() public {
         user = new User();
         relayer = new SetterRelayer();
-        overlay = new SetterRelayerOverlay(address(relayer));
+        overlay = new MinimalSetterRelayerOverlay(address(relayer));
     }
 
     function test_setup() public {

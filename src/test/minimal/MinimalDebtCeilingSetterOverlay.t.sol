@@ -2,10 +2,10 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {DebtCeilingSetterOverlay} from "../../overlays/minimal/DebtCeilingSetterOverlay.sol";
+import {MinimalDebtCeilingSetterOverlay} from "../../overlays/minimal/MinimalDebtCeilingSetterOverlay.sol";
 
 contract User {
-    function doModifyParameters(DebtCeilingSetterOverlay overlay, bytes32 parameter, uint256 val) public {
+    function doModifyParameters(MinimalDebtCeilingSetterOverlay overlay, bytes32 parameter, uint256 val) public {
         overlay.modifyParameters(parameter, val);
     }
 }
@@ -19,15 +19,15 @@ contract DebtCeilingSetter {
     }
 }
 
-contract DebtCeilingSetterOverlayTest is DSTest {
+contract MinimalDebtCeilingSetterOverlayTest is DSTest {
     User user;
     DebtCeilingSetter setter;
-    DebtCeilingSetterOverlay overlay;
+    MinimalDebtCeilingSetterOverlay overlay;
 
     function setUp() public {
         user     = new User();
         setter   = new DebtCeilingSetter();
-        overlay  = new DebtCeilingSetterOverlay(address(setter));
+        overlay  = new MinimalDebtCeilingSetterOverlay(address(setter));
     }
 
     function test_setup() public {

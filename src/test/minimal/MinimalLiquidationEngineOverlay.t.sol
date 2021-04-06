@@ -4,7 +4,7 @@ import "ds-test/test.sol";
 
 import "geb/LiquidationEngine.sol";
 
-import "../../overlays/minimal/LiquidationEngineOverlay.sol";
+import "../../overlays/minimal/MinimalLiquidationEngineOverlay.sol";
 
 contract SimpleSAFEEngine {
     function approveSAFEModification(address account) external {}
@@ -28,25 +28,25 @@ contract GenuineSaviour {
     }
 }
 contract User {
-    function doConnectSaviour(LiquidationEngineOverlay overlay, address saviour) public {
+    function doConnectSaviour(MinimalLiquidationEngineOverlay overlay, address saviour) public {
         overlay.connectSAFESaviour(saviour);
     }
-    function doDisconnectSaviour(LiquidationEngineOverlay overlay, address saviour) public {
+    function doDisconnectSaviour(MinimalLiquidationEngineOverlay overlay, address saviour) public {
         overlay.disconnectSAFESaviour(saviour);
     }
 }
 
-contract LiquidationEngineOverlayTest is DSTest {
+contract MinimalLiquidationEngineOverlayTest is DSTest {
     LiquidationEngine liquidationEngine;
     SimpleSAFEEngine safeEngine;
-    LiquidationEngineOverlay overlay;
+    MinimalLiquidationEngineOverlay overlay;
     GenuineSaviour saviour;
     User user;
 
     function setUp() public {
         safeEngine        = new SimpleSAFEEngine();
         liquidationEngine = new LiquidationEngine(address(safeEngine));
-        overlay           = new LiquidationEngineOverlay(address(liquidationEngine));
+        overlay           = new MinimalLiquidationEngineOverlay(address(liquidationEngine));
         saviour           = new GenuineSaviour(address(safeEngine), address(liquidationEngine));
         user              = new User();
 

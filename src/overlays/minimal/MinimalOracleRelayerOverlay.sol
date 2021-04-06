@@ -6,12 +6,12 @@ abstract contract OracleRelayerLike {
     function modifyParameters(bytes32, uint256) virtual external;
     function redemptionPrice() virtual public returns (uint256);
 }
-contract OracleRelayerOverlay is GebAuth {
+contract MinimalOracleRelayerOverlay is GebAuth {
     OracleRelayerLike public oracleRelayer;
     uint256           public constant RAY = 10 ** 27;
 
     constructor(address oracleRelayer_) public GebAuth() {
-        require(oracleRelayer_ != address(0), "OracleRelayerOverlay/null-address");
+        require(oracleRelayer_ != address(0), "MinimalOracleRelayerOverlay/null-address");
         oracleRelayer = OracleRelayerLike(oracleRelayer_);
     }
 

@@ -2,10 +2,10 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../../overlays/minimal/StabilityFeeTreasuryOverlay.sol";
+import "../../overlays/minimal/MinimalStabilityFeeTreasuryOverlay.sol";
 
 contract User {
-    function doTakeFunds(StabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {
+    function doTakeFunds(MinimalStabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {
         overlay.takeFunds(dst, amount);
     }
 }
@@ -15,17 +15,17 @@ contract StabilityFeeTreasury {
     }
 }
 
-contract StabilityFeeTreasuryOverlayTest is DSTest {
+contract MinimalStabilityFeeTreasuryOverlayTest is DSTest {
     User user;
     StabilityFeeTreasury treasury;
-    StabilityFeeTreasuryOverlay overlay;
+    MinimalStabilityFeeTreasuryOverlay overlay;
 
     function setUp() public {
         user     = new User();
         treasury = new StabilityFeeTreasury();
-        overlay  = new StabilityFeeTreasuryOverlay(address(treasury));
+        overlay  = new MinimalStabilityFeeTreasuryOverlay(address(treasury));
     }
-    
+
     function test_setup() public {
         assertEq(address(overlay.treasury()), address(treasury));
     }

@@ -6,11 +6,11 @@ abstract contract LiquidationEngineLike {
     function connectSAFESaviour(address) virtual external;
     function disconnectSAFESaviour(address) virtual external;
 }
-contract LiquidationEngineOverlay is GebAuth {
+contract MinimalLiquidationEngineOverlay is GebAuth {
     LiquidationEngineLike public liquidationEngine;
 
     constructor(address liquidationEngine_) public GebAuth() {
-        require(liquidationEngine_ != address(0), "LiquidationEngineOverlay/null-address");
+        require(liquidationEngine_ != address(0), "MinimalLiquidationEngineOverlay/null-address");
         liquidationEngine = LiquidationEngineLike(liquidationEngine_);
     }
 
