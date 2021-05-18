@@ -22,10 +22,13 @@ contract MinimalRateSetterOverlayTest is DSTest {
     MinimalRateSetterOverlay overlay;
     RateSetter rateSetter;
 
+    address pCalculator  = address(0x1);
+    address piCalculator = address(0x2);
+
     function setUp() public {
         user = new User();
         rateSetter = new RateSetter();
-        overlay = new MinimalRateSetterOverlay(address(rateSetter));
+        overlay = new MinimalRateSetterOverlay(address(rateSetter), pCalculator, piCalculator);
     }
 
     function test_setup() public {
