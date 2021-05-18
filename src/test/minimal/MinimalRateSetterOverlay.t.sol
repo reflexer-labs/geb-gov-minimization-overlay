@@ -11,9 +11,11 @@ contract User {
 }
 contract RateSetter {
     address public orcl;
+    address public pidCalculator;
 
     function modifyParameters(bytes32 parameter, address addr) external {
         if (parameter == "orcl") orcl = addr;
+        else if (parameter == "pidCalculator") pidCalculator = addr;
     }
 }
 
@@ -46,6 +48,17 @@ contract MinimalRateSetterOverlayTest is DSTest {
     function test_set_orcl() public {
         overlay.modifyParameters("orcl", address(0x1));
         assertEq(address(rateSetter.orcl()), address(0x1));
+    }
+    function test_set_p_calculator() public {
+        overlay.modifyParameters("pidCalculator", pCalculator);
+        assertEq(address(rateSetter.pidCalculator()), pCalculator);
+    }
+    function test_set_pi_calculator() public {
+        overlay.modifyParameters("pidCalculator", piCalculator);
+        assertEq(address(rateSetter.pidCalculator()), piCalculator);
+    }
+    function testFail_set_random_calculator() public {
+        overlay.modifyParameters("pidCalculator", address(0x123456789));
     }
     function testFail_set_orcl_unauthed() public {
         user.doModifyParameters(overlay, "orcl", address(0x1));

@@ -40,9 +40,9 @@ contract MinimalIncreasingTreasuryReimbursementOverlay is GebAuth {
     * @param data The new value for baseUpdateCallerReward or maxUpdateCallerReward
     */
     function modifyParameters(address reimburser, bytes32 parameter, uint256 data) external isAuthorized {
-        require(reimbursers[reimburser] == 1, "MinimalIncreasingTreasuryReimbursementOverlay/");
+        require(reimbursers[reimburser] == 1, "MinimalIncreasingTreasuryReimbursementOverlay/not-whitelisted");
         if (either(parameter == "baseUpdateCallerReward", parameter == "maxUpdateCallerReward")) {
-          IncreasingTreasuryReimbursementLike(reimbursers[reimburser]).modifyParameters(parameter, data);
+          IncreasingTreasuryReimbursementLike(reimburser).modifyParameters(parameter, data);
         } else revert("MinimalIncreasingTreasuryReimbursementOverlay/modify-forbidden-param");
     }
 }
