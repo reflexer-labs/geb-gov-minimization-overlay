@@ -21,7 +21,7 @@ contract MinimalIncreasingTreasuryReimbursementOverlay is GebAuth {
 
     // --- Administration ---
     /*
-    * @notice Whitelist/blacklist a reimmburser contract
+    * @notice Whitelist/blacklist a reimburser contract
     * @param reimburser The reimburser address
     */
     function toggleReimburser(address reimburser) external isAuthorized {

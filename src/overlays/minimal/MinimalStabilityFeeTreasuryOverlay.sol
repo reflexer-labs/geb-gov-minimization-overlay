@@ -13,6 +13,11 @@ contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
         treasury = StabilityFeeTreasuryLike(treasury_);
     }
 
+    // --- Boolean Logic ---
+    function either(bool x, bool y) internal pure returns (bool z) {
+        assembly{ z := or(x, y)}
+    }
+
     /*
     * @notify Call the treasury so it can take funds from another address
     * @param account The address that the treasury should take funds from
@@ -20,5 +25,16 @@ contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
     */
     function takeFunds(address account, uint256 amount) external isAuthorized {
         treasury.takeFunds(account, amount);
+    }
+    /*
+    * @notify Modify an uint256 param
+    * @param parameter Must be "lastUpdateTime"
+    * @param data The new value for lastUpdateTime
+    */
+    function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
+        if (either(either(parameter == "treasuryCapacity", parameter == "minimumFundsRequired")), parameter == "pullFundsMinThreshold") {
+          require(data >= block.timestamp, "MinimalSingleDebtFloorAdjusterOverlay/invalid-data");
+          adjuster.modifyParameters(parameter, data);
+        } else revert("MinimalSingleDebtFloorAdjusterOverlay/modify-forbidden-param");
     }
 }
