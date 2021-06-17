@@ -4,6 +4,7 @@ import "../../auth/GebAuth.sol";
 
 abstract contract AccountingEngineLike {
     function modifyParameters(bytes32, address) virtual external;
+    function modifyParameters(bytes32, uint256) virtual external;
 }
 contract MinimalAccountingEngineOverlay is GebAuth {
     AccountingEngineLike public accountingEngine;
@@ -21,6 +22,18 @@ contract MinimalAccountingEngineOverlay is GebAuth {
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         if (parameter == "systemStakingPool") {
           accountingEngine.modifyParameters(parameter, data);
-        } else revert("MinimalAccountingEngineOverlay/modify-forbidden-param");
+        }
+        else revert("MinimalAccountingEngineOverlay/modify-forbidden-param");
+    }
+    /*
+    * @notice Modify extraSurplusIsTransferred
+    * @param parameter Must be "extraSurplusIsTransferred"
+    * @param data The new value for extraSurplusIsTransferred
+    */
+    function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
+        if (parameter == "extraSurplusIsTransferred") {
+          accountingEngine.modifyParameters(parameter, data);
+        }
+        else revert("MinimalAccountingEngineOverlay/modify-forbidden-param");
     }
 }

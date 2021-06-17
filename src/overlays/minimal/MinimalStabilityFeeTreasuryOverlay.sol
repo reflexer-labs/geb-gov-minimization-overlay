@@ -4,6 +4,7 @@ import "../../auth/GebAuth.sol";
 
 abstract contract StabilityFeeTreasuryLike {
     function takeFunds(address, uint256) virtual external;
+    function modifyParameters(bytes32, uint256) virtual external;
 }
 contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
     StabilityFeeTreasuryLike public treasury;
@@ -32,9 +33,8 @@ contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
     * @param data The new value for lastUpdateTime
     */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
-        if (either(either(parameter == "treasuryCapacity", parameter == "minimumFundsRequired")), parameter == "pullFundsMinThreshold") {
-          require(data >= block.timestamp, "MinimalSingleDebtFloorAdjusterOverlay/invalid-data");
-          adjuster.modifyParameters(parameter, data);
-        } else revert("MinimalSingleDebtFloorAdjusterOverlay/modify-forbidden-param");
+        if (either(either(parameter == "treasuryCapacity", parameter == "minimumFundsRequired"), parameter == "pullFundsMinThreshold")) {
+          treasury.modifyParameters(parameter, data);
+        } else revert("MinimalStabilityFeeTreasuryOverlay/modify-forbidden-param");
     }
 }
