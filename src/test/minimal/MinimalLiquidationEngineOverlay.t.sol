@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "geb/LiquidationEngine.sol";
+import "geb/single/LiquidationEngine.sol";
 
 import "../../overlays/minimal/MinimalLiquidationEngineOverlay.sol";
 

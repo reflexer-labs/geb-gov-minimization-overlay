@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import {BurningSurplusAuctionHouse, RecyclingSurplusAuctionHouse} from "geb/SurplusAuctionHouse.sol";
+import {BurningSurplusAuctionHouse, RecyclingSurplusAuctionHouse} from "geb/single/SurplusAuctionHouse.sol";
 
 import "../../overlays/partial/PartialSurplusAuctionHouseOverlay.sol";
 

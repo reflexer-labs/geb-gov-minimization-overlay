@@ -2,8 +2,8 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "geb/OracleRelayer.sol";
-import "geb/SAFEEngine.sol";
+import "geb/single/OracleRelayer.sol";
+import "geb/single/SAFEEngine.sol";
 
 import "../../overlays/minimal/MinimalOracleRelayerOverlay.sol";
 

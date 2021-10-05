@@ -2,8 +2,8 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "geb/TaxCollector.sol";
-import "geb/SAFEEngine.sol";
+import "geb/single/TaxCollector.sol";
+import "geb/single/SAFEEngine.sol";
 
 import "../../overlays/minimal/MinimalTaxCollectorOverlay.sol";
 

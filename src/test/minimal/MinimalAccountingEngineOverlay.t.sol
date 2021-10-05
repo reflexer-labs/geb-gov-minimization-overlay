@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "geb/AccountingEngine.sol";
+import "geb/single/AccountingEngine.sol";
 import "../../overlays/minimal/MinimalAccountingEngineOverlay.sol";
 
 contract SimpleStakingPool {

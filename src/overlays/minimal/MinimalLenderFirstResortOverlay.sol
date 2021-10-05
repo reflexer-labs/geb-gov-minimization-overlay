@@ -6,15 +6,15 @@ abstract contract GebLenderFirstResortRewardsLike {
     function modifyParameters(bytes32, uint256) virtual external;
 }
 contract MinimalLenderFirstResortOverlay is GebAuth {
-    GebLenderFirstResortRewards public staking;
+    GebLenderFirstResortRewardsLike public staking;
 
     // Max amount of staked tokens to keep
-    uint256                     public maxStakedTokensToKeep;
+    uint256                         public maxStakedTokensToKeep;
 
     constructor(address staking_, uint256 maxStakedTokensToKeep_) public GebAuth() {
         require(staking_ != address(0), "MinimalLenderFirstResortOverlay/null-address");
         require(maxStakedTokensToKeep_ > 0, "MinimalLenderFirstResortOverlay/null-maxStakedTokensToKeep");
-        staking               = GebLenderFirstResortRewards(staking_);
+        staking               = GebLenderFirstResortRewardsLike(staking_);
         maxStakedTokensToKeep = maxStakedTokensToKeep_;
     }
 

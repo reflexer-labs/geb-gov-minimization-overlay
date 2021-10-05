@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "geb/DebtAuctionHouse.sol";
+import "geb/single/DebtAuctionHouse.sol";
 
 import "../../overlays/partial/PartialDebtAuctionHouseOverlay.sol";
 
