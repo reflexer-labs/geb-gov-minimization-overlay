@@ -13,11 +13,6 @@ contract MinimalAutoSurplusBufferSetterOverlay is GebAuth {
         autoSurplusBuffer = AutoSurplusBufferSetterLike(autoSurplusBuffer_);
     }
 
-    // --- Boolean Logic ---
-    function either(bool x, bool y) internal pure returns (bool z) {
-        assembly{ z := or(x, y)}
-    }
-
     /*
     * @notify Change the stopAdjustments value
     * @param parameter Must be "stopAdjustments"
