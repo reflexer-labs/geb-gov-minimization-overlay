@@ -8,9 +8,6 @@ abstract contract SFTreasuryCoreParamAdjusterLike {
 }
 
 contract MinimalSFTreasuryCoreParamAdjusterOverlay is GebAuth {
-    // latestExpectedCalls
-    // minPullFundsThreshold
-    // pullFundsMinThresholdMultiplier
     SFTreasuryCoreParamAdjusterLike public adjuster;
 
     constructor(address adjuster_) public GebAuth() {
