@@ -25,7 +25,10 @@ contract MinimalLenderFirstResortOverlay is GebAuth {
     */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
         if (parameter == "escrowPaused") {
-          staking.modifyParameters(parameter, data);
+            staking.modifyParameters(parameter, data);
+        } else if (parameter == "minStakedTokensToKeep") {
+            require(data <= maxStakedTokensToKeep, "MinimalLenderFirstResortOverlay/minStakedTokensToKeep-over-limit");
+            staking.modifyParameters(parameter, data);
         }
         else revert("MinimalLenderFirstResortOverlay/modify-forbidden-param");
     }
