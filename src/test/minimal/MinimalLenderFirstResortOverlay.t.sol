@@ -12,10 +12,16 @@ contract User {
 contract LenderFirstResort {
     uint256 public escrowPaused;
     uint256 public minStakedTokensToKeep;
+    uint256 public bypassAuctions;
+    uint256 public tokensToAuction;
+    uint256 public systemCoinsToRequest;
 
     function modifyParameters(bytes32 parameter, uint256 data) public {
         if (parameter == "escrowPaused") escrowPaused = data;
         if (parameter == "minStakedTokensToKeep") minStakedTokensToKeep = data;
+        if (parameter == "bypassAuctions") bypassAuctions = data;
+        if (parameter == "tokensToAuction") tokensToAuction = data;
+        if (parameter == "systemCoinsToRequest") systemCoinsToRequest = data;
     }
 }
 
@@ -61,5 +67,17 @@ contract MinimalLenderFirstResortOverlayTest is DSTest {
     }
     function testFail_set_minStakedTokensToKeep_over_max() public {
         overlay.modifyParameters("minStakedTokensToKeep", maxStakedTokensToKeep + 1);
+    }
+    function test_set_bypassAuctions() public {
+        overlay.modifyParameters("bypassAuctions", 1);
+        assertEq(staking.bypassAuctions(), 1);
+    }
+    function test_set_tokensToAuction() public {
+        overlay.modifyParameters("tokensToAuction", 1 ether);
+        assertEq(staking.tokensToAuction(), 1 ether);
+    }
+    function test_set_systemCoinsToRequest() public {
+        overlay.modifyParameters("systemCoinsToRequest", 100 ether);
+        assertEq(staking.systemCoinsToRequest(), 100 ether);
     }
 }
