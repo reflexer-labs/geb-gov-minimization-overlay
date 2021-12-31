@@ -4,6 +4,7 @@ import "../../auth/GebAuth.sol";
 
 abstract contract GebLenderFirstResortRewardsLike {
     function modifyParameters(bytes32, uint256) virtual external;
+    function toggleBypassAuctions() virtual external;
 }
 contract MinimalLenderFirstResortOverlay is GebAuth {
     GebLenderFirstResortRewardsLike public staking;
@@ -19,17 +20,28 @@ contract MinimalLenderFirstResortOverlay is GebAuth {
     }
 
     /*
-    * @notify Modify escrowPaused
-    * @param parameter Must be "escrowPaused"
-    * @param data The new value for escrowPaused
+    * @notify Modify parameters
+    * @param parameter Must be either minStakedTokensToKeep, escrowPaused, tokensToAuction or systemCoinsToRequest
+    * @param data The new value for the parameter
     */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
-        if (parameter == "escrowPaused") {
-            staking.modifyParameters(parameter, data);
-        } else if (parameter == "minStakedTokensToKeep") {
+        if (parameter == "minStakedTokensToKeep") {
             require(data <= maxStakedTokensToKeep, "MinimalLenderFirstResortOverlay/minStakedTokensToKeep-over-limit");
             staking.modifyParameters(parameter, data);
-        }
+        } else if (
+            parameter == "escrowPaused"    ||
+            parameter == "tokensToAuction" ||
+            parameter == "systemCoinsToRequest"
+            ) staking.modifyParameters(parameter, data);
         else revert("MinimalLenderFirstResortOverlay/modify-forbidden-param");
     }
+
+    /*
+    * @notify Bypass Auctions
+    */
+    function toggleBypassAuctions() external isAuthorized {
+        staking.toggleBypassAuctions();
+    }
+
+
 }
