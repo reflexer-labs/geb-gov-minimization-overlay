@@ -109,6 +109,7 @@ contract ControllerSwapOverlayTest is DSTest {
     CalculatorMock calculator;
 
     function setUp() public {
+        // Local
         calculator = new CalculatorMock();
         rateSetter = new RateSetterMock(address(calculator));
         oracleRelayer = new OracleRelayerMock();
@@ -119,6 +120,19 @@ contract ControllerSwapOverlayTest is DSTest {
             3600,
             false
         );
+
+        // Mainnet
+        // calculator = CalculatorMock(0xddA334de7A9C57A641616492175ca203Ba8Cf981);
+        // rateSetter = RateSetterMock(0x7Acfc14dBF2decD1c9213Db32AE7784626daEb48);
+        // oracleRelayer = OracleRelayerMock(0x4ed9C0dCa0479bC64d8f4EB3007126D5791f7851);
+        // overlay = new ControllerSwapOverlay(
+        //     pauseProxy,
+        //     RateSetterLike(address(rateSetter)),
+        //     OracleRelayerLike(address(oracleRelayer)),
+        //     3600,
+        //     false
+        // );
+        // giveAuth(address(rateSetter), address(overlay)); // cheat
 
         hevm.warp(calculator.lut());
     }
@@ -176,6 +190,13 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(calculator.lut(), newCalculator.lut());
         assertEq(calculator.pdc(), newCalculator.pdc());
 
+        // check imported state matches last state of previous controller
+        (uint oldTimestamp, int oldProportionalDeviationObservation, int oldIntegralDeviationObservation) = calculator.dos(calculator.oll() - 1);
+        (uint newTimestamp, int newProportionalDeviationObservation, int newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
+        assertEq(oldTimestamp, newTimestamp);
+        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation);
+        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation);
+
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));
         assertEq(newCalculator.authorities(calculatorOverlay), 1);
@@ -197,6 +218,11 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(calculator.folb(), newCalculator.folb());
         assertEq(calculator.lut(), newCalculator.lut());
         assertEq(calculator.pdc(), newCalculator.pdc());
+
+        (newTimestamp, newProportionalDeviationObservation, newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
+        assertEq(oldTimestamp, newTimestamp);
+        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation);
+        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation);
 
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));

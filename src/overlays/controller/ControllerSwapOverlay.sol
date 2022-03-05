@@ -39,25 +39,45 @@ abstract contract OracleRelayerLike {
 // @dev Needs to be authed in rateSetter
 contract ControllerSwapOverlay is GebAuth {
 
-    address public immutable pauseProxy;
-    bool public isScaled;
-    uint256 public lastUpdateTime;
-    uint256 public immutable updateDelay;
-    RateSetterLike public immutable rateSetter;
+    // State vars
+    address           public immutable pauseProxy;
+    RateSetterLike    public immutable rateSetter;
     OracleRelayerLike public immutable oracleRelayer;
 
+    // delay enforced between controller swaps
+    uint256           public immutable updateDelay;
+    // last time a controller swap happened
+    uint256           public           lastUpdateTime;
+    // true if the current controller is scaled
+    bool              public           isScaled;
+
+    // Overlay bounds
     struct OverlayBounds {
         bytes32[] unsignedParams;
         bytes32[] signedParams;
         uint256[] unsignedUpperBounds;
         uint256[] unsignedLowerBounds;
-        int256[] signedUpperBounds;
-        int256[] signedLowerBounds;
+        int256[]  signedUpperBounds;
+        int256[]  signedLowerBounds;
     }
-
     OverlayBounds[] bounds;
 
-    constructor(address _pauseProxy, RateSetterLike _rateSetter, OracleRelayerLike _oracleRelayer, uint256 _updateDelay, bool _isScaled) public GebAuth() {
+    /**
+     * @notice Constructor
+     * @param _pauseProxy Address of pause.proxy()
+     * @param _rateSetter Address of the rate setter
+     * @param _oracleRelayer Address of the oracle relayer
+     * @param _updateDelay Delay enforced betweed controller swaps
+     * @param _isScaled True if current controller is scaled
+     */
+    constructor(
+        address           _pauseProxy,
+        RateSetterLike    _rateSetter,
+        OracleRelayerLike _oracleRelayer,
+        uint256           _updateDelay,
+        bool              _isScaled
+    ) public GebAuth() {
+
         pauseProxy = _pauseProxy;
         rateSetter = _rateSetter;
         oracleRelayer = _oracleRelayer;
@@ -86,18 +106,23 @@ contract ControllerSwapOverlay is GebAuth {
         ));
     }
 
+    // Math
     int256 constant RAY = 10 ** 27;
 
     function imul(int256 x, int256 y) internal pure returns (int256 z) {
         require(y == 0 || (z = x * y) / y == x, "mul-overflow");
     }
 
+    /**
+     * @notice Will swap between a raw and scaled controllers, keeping the same parameters
+     */
     function swapCalculator() external isAuthorized returns (address calculator, address overlay) {
         require(lastUpdateTime + updateDelay <= block.timestamp, "ControllerSwapOverlay/too-early");
 
         CalculatorLike currentCalculator = CalculatorLike(rateSetter.pidCalculator());
         uint256 redemptionPrice = oracleRelayer.redemptionPrice();
 
+        // Fetch last observation data to populate next controller state
         (
             uint256 deviationTimestamp,
             int256  deviationProportional,
@@ -157,9 +182,6 @@ contract ControllerSwapOverlay is GebAuth {
         // auth
         CalculatorLike(calculator).addAuthority(overlay);
         CalculatorLike(calculator).removeAuthority(address(this));
-
-        // call updateRate
-        rateSetter.updateRate(address(0x83533fdd3285f48204215E9CF38C785371258E76)); // GEB_STABILITY_FEE_TREASURY
 
         isScaled = !isScaled;
         lastUpdateTime = now;
