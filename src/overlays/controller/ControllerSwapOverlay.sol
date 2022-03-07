@@ -2,6 +2,7 @@ pragma solidity 0.6.7;
 
 import "../../auth/GebAuth.sol";
 import "../minimal/MinimalRrfmCalculatorOverlay.sol";
+import "geb-rrfm-calculators/math/SignedSafeMath.sol";
 import "geb-rrfm-calculators/calculator/PIRawPerSecondCalculator.sol";
 import "geb-rrfm-calculators/calculator/PIScaledPerSecondCalculator.sol";
 
@@ -37,7 +38,7 @@ abstract contract OracleRelayerLike {
 }
 // @notice Swaps between raw and scaled controllers
 // @dev Needs to be authed in rateSetter
-contract ControllerSwapOverlay is GebAuth {
+contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
 
     // State vars
     address           public immutable pauseProxy;
@@ -51,16 +52,15 @@ contract ControllerSwapOverlay is GebAuth {
     // true if the current controller is scaled
     bool              public           isScaled;
 
-    // Overlay bounds
-    struct OverlayBounds {
-        bytes32[] unsignedParams;
-        bytes32[] signedParams;
-        uint256[] unsignedUpperBounds;
-        uint256[] unsignedLowerBounds;
-        int256[]  signedUpperBounds;
-        int256[]  signedLowerBounds;
-    }
-    OverlayBounds[] bounds;
+    // Overlay bounds (raw)
+    bytes32[] unsignedParams      = [bytes32("pscl")];
+    bytes32[] signedParams        = [bytes32("sg"), bytes32("ag")];
+    uint256[] unsignedUpperBounds = [1000000000000000000000000000];
+    uint256[] unsignedLowerBounds = [999998844239760000000000000];
+    int256[] signedUpperBounds    = [400000000000, 100000];
+    int256[] signedLowerBounds    = [10000000000, 0];
+
+    int256 constant RAY = 10 ** 27;
 
     /**
      * @notice Constructor
@@ -83,36 +83,68 @@ contract ControllerSwapOverlay is GebAuth {
         oracleRelayer = _oracleRelayer;
         updateDelay = _updateDelay;
         isScaled = _isScaled;
-
-
-        // populate bounds - index 0 == raw
-        bounds.push(OverlayBounds(
-            new bytes32[](0),
-            new bytes32[](0),
-            new uint256[](0),
-            new uint256[](0),
-            new int256[](0),
-            new int256[](0)
-        ));
-
-        // index 1 == scaled
-        bounds.push(OverlayBounds(
-            new bytes32[](0),
-            new bytes32[](0),
-            new uint256[](0),
-            new uint256[](0),
-            new int256[](0),
-            new int256[](0)
-        ));
     }
 
-    // Math
-    int256 constant RAY = 10 ** 27;
+    // Internal functions
+    /**
+     * @notice Returns a PID Controller current state
+     * @param calculator PID controller
+    **/
+    function getCalculatorState(CalculatorLike calculator) internal view returns (int256[] memory state) {
+        (
+            uint256 deviationTimestamp,
+            int256  deviationProportional,
+            int256  deviationIntegral
+        ) = calculator.dos(calculator.oll() - 1);
 
-    function imul(int256 x, int256 y) internal pure returns (int256 z) {
-        require(y == 0 || (z = x * y) / y == x, "mul-overflow");
+        state = new int256[](5);
+        state[0] = int256(calculator.lut());      // lastUpdateTime
+        state[1] = deviationProportional;           // deviationObservations.proportional
+        state[2] = deviationIntegral;               // deviationObservations.integral
+        state[3] = calculator.pdc();              // priceDeviationCumulative
+        state[4] = int256(deviationTimestamp);      // deviationObservations.timestamp
     }
 
+    /**
+     * @notice Deploys and attaches an overlay to a new controller
+     * @param calculator New controller being deployed
+     * @param redemptionPrice Current redemption price (RAY)
+    **/
+    function setupOverlay(address calculator, int256 redemptionPrice) internal returns (address) {
+        // deploy new overlay
+        MinimalRrfmCalculatorOverlay overlay = new MinimalRrfmCalculatorOverlay(
+            calculator,
+            unsignedParams,
+            signedParams,
+            unsignedUpperBounds,
+            unsignedLowerBounds,
+            isScaled ? signedUpperBounds : adjustSignedBoundsForScaledPID(signedUpperBounds, redemptionPrice),
+            isScaled ? signedLowerBounds : adjustSignedBoundsForScaledPID(signedLowerBounds, redemptionPrice)
+
+        );
+
+        // auth
+        CalculatorLike(calculator).addAuthority(address(overlay));
+        overlay.addAuthorization(pauseProxy);
+        overlay.removeAuthorization(address(this));
+
+        return address(overlay);
+    }
+
+    /**
+     * @notice Adjusts bounds for Scaled PID Controller (divides bounds by current redemptionPrice)
+     * @param bounds Aray of bounds
+     * @param redemptionPrice Current redemption price (RAY)
+    **/
+    function adjustSignedBoundsForScaledPID(int256[] memory bounds, int256 redemptionPrice) internal pure returns (int256[] memory) {
+        uint256 length = bounds.length;
+        for (uint256 i; i < length; i++)
+            bounds[i] = divide(multiply(bounds[i], RAY), redemptionPrice);
+
+        return bounds;
+    }
+
+    // External functions
     /**
      * @notice Will swap between a raw and scaled controllers, keeping the same parameters
      */
@@ -120,42 +152,31 @@ contract ControllerSwapOverlay is GebAuth {
         require(lastUpdateTime + updateDelay <= block.timestamp, "ControllerSwapOverlay/too-early");
 
         CalculatorLike currentCalculator = CalculatorLike(rateSetter.pidCalculator());
-        uint256 redemptionPrice = oracleRelayer.redemptionPrice();
+        int256 redemptionPrice = int256(oracleRelayer.redemptionPrice());
 
         // Fetch last observation data to populate next controller state
-        (
-            uint256 deviationTimestamp,
-            int256  deviationProportional,
-            int256  deviationIntegral
-        ) = currentCalculator.dos(currentCalculator.oll() - 1);
-
-        int256[] memory currentState = new int256[](5);
-        currentState[0] = int256(currentCalculator.lut());
-        currentState[1] = deviationProportional;
-        currentState[2] = deviationIntegral;
-        currentState[3] = currentCalculator.pdc();
-        currentState[4] = int256(deviationTimestamp);
+        int256[] memory currentState = getCalculatorState(currentCalculator);
 
         if (isScaled)
             calculator = address(new PIRawPerSecondCalculator(
-                imul(currentCalculator.sg(), int256(redemptionPrice)) / RAY, // kp
-                imul(currentCalculator.ag(), int256(redemptionPrice)) / RAY, // ki
-                currentCalculator.pscl(),                                    // perSecondCumulativeLeak
-                currentCalculator.ips(),                                     // integralPeriodSize
-                currentCalculator.nb(),                                      // noiseBarrier
-                currentCalculator.foub(),                                    // feedbackOutputUpperBound
-                currentCalculator.folb(),                                    // feedbackOutputLowerBound
+                divide(multiply(currentCalculator.sg(), redemptionPrice), RAY), // kp
+                divide(multiply(currentCalculator.ag(), redemptionPrice), RAY), // ki
+                currentCalculator.pscl(),                                       // perSecondCumulativeLeak
+                currentCalculator.ips(),                                        // integralPeriodSize
+                currentCalculator.nb(),                                         // noiseBarrier
+                currentCalculator.foub(),                                       // feedbackOutputUpperBound
+                currentCalculator.folb(),                                       // feedbackOutputLowerBound
                 currentState
             ));
         else
             calculator = address(new PIScaledPerSecondCalculator(
-                imul(currentCalculator.sg(), RAY) / int(redemptionPrice),    // kp
-                imul(currentCalculator.ag(), RAY) / int(redemptionPrice),    // ki
-                currentCalculator.pscl(),                                    // perSecondCumulativeLeak
-                currentCalculator.ips(),                                     // integralPeriodSize
-                currentCalculator.nb(),                                      // noiseBarrier
-                currentCalculator.foub(),                                    // feedbackOutputUpperBound
-                currentCalculator.folb(),                                    // feedbackOutputLowerBound
+                divide(multiply(currentCalculator.sg(), RAY), redemptionPrice), // kp
+                divide(multiply(currentCalculator.ag(), RAY), redemptionPrice), // ki
+                currentCalculator.pscl(),                                       // perSecondCumulativeLeak
+                currentCalculator.ips(),                                        // integralPeriodSize
+                currentCalculator.nb(),                                         // noiseBarrier
+                currentCalculator.foub(),                                       // feedbackOutputUpperBound
+                currentCalculator.folb(),                                       // feedbackOutputLowerBound
                 currentState
             ));
 
@@ -166,21 +187,9 @@ contract ControllerSwapOverlay is GebAuth {
         rateSetter.modifyParameters("pidCalculator", calculator);
         CalculatorLike(calculator).modifyParameters("seedProposer", address(rateSetter));
 
-        uint256 boundsIndex = (isScaled) ? 0 : 1;
-
         // overlay
-        overlay = address(new MinimalRrfmCalculatorOverlay(
-            calculator,
-            bounds[boundsIndex].unsignedParams,
-            bounds[boundsIndex].signedParams,
-            bounds[boundsIndex].unsignedUpperBounds,
-            bounds[boundsIndex].unsignedLowerBounds,
-            bounds[boundsIndex].signedUpperBounds,
-            bounds[boundsIndex].signedLowerBounds
-        ));
+        overlay = setupOverlay(calculator, redemptionPrice);
 
-        // auth
-        CalculatorLike(calculator).addAuthority(overlay);
         CalculatorLike(calculator).removeAuthority(address(this));
 
         isScaled = !isScaled;

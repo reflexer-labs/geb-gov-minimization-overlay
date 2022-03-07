@@ -2,7 +2,6 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-// import "geb/single/AccountingEngine.sol";
 import "../../overlays/controller/ControllerSwapOverlay.sol";
 
 contract RateSetterMock {
@@ -175,10 +174,12 @@ contract ControllerSwapOverlayTest is DSTest {
         overlay.removeAuthorization(address(this));
         assertEq(overlay.authorizedAccounts(address(this)), 0);
     }
-    function test_swap_controller() public {
-        (address calc, address calculatorOverlay) = overlay.swapCalculator();
+    function test_swap_controller_to_scaled() public {
+        (address calc,) = overlay.swapCalculator();
 
         CalculatorLike newCalculator = CalculatorLike(calc);
+
+        int redemptionPrice = int(oracleRelayer.redemptionPrice());
 
         assertEq(calculator.sg(), newCalculator.sg() * 3);
         assertEq(calculator.ag(), newCalculator.ag() * 3);
@@ -199,15 +200,17 @@ contract ControllerSwapOverlayTest is DSTest {
 
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));
-        assertEq(newCalculator.authorities(calculatorOverlay), 1);
         assertEq(newCalculator.authorities(address(overlay)), 0);
         assertTrue(overlay.isScaled());
+    }
 
+    function test_swap_controller_to_raw() public {
+        overlay.swapCalculator();
         hevm.warp(now + 3600);
 
-        (calc, calculatorOverlay) = overlay.swapCalculator();
+        (address calc,) = overlay.swapCalculator();
 
-        newCalculator = CalculatorLike(calc);
+        CalculatorLike newCalculator = CalculatorLike(calc);
 
         assertEq(calculator.sg(), newCalculator.sg());
         assertEq(calculator.ag(), newCalculator.ag());
@@ -219,16 +222,65 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(calculator.lut(), newCalculator.lut());
         assertEq(calculator.pdc(), newCalculator.pdc());
 
-        (newTimestamp, newProportionalDeviationObservation, newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
+        (uint oldTimestamp, int oldProportionalDeviationObservation, int oldIntegralDeviationObservation) = calculator.dos(calculator.oll() - 1);
+        (uint newTimestamp, int newProportionalDeviationObservation, int newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
         assertEq(oldTimestamp, newTimestamp);
         assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation);
         assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation);
 
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));
-        assertEq(newCalculator.authorities(calculatorOverlay), 1);
         assertEq(newCalculator.authorities(address(overlay)), 0);
         assertTrue(!overlay.isScaled());
+    }
+
+    function test_new_overlay_swap_to_raw() public {
+        overlay.swapCalculator();
+        hevm.warp(now + 3600);
+
+        (address calc, address calcOverlay) = overlay.swapCalculator();
+
+        MinimalRrfmCalculatorOverlay calculatorOverlay = MinimalRrfmCalculatorOverlay(calcOverlay);
+
+        assertEq(calculatorOverlay.authorizedAccounts(address(this)), 0);
+        assertEq(calculatorOverlay.authorizedAccounts(address(overlay)), 0);
+        assertEq(calculatorOverlay.authorizedAccounts(pauseProxy), 1);
+        assertEq(CalculatorLike(calc).authorities(calcOverlay), 1);
+
+        (int256 upperBound, int256 lowerBound) = calculatorOverlay.signedBounds(bytes32("sg"));
+        assertEq(upperBound, 400000000000);
+        assertEq(lowerBound,  10000000000);
+
+        (upperBound, lowerBound) = calculatorOverlay.signedBounds(bytes32("ag"));
+        assertEq(upperBound, 100000);
+        assertEq(lowerBound,      0);
+
+        (uint256 unsignedUpperBound, uint256 unsignedLowerBound) = calculatorOverlay.unsignedBounds(bytes32("pscl"));
+        assertEq(unsignedUpperBound, 1000000000000000000000000000);
+        assertEq(unsignedLowerBound,  999998844239760000000000000);
+    }
+
+    function test_new_overlay_swap_to_scaled() public {
+        (address calc, address calcOverlay) = overlay.swapCalculator();
+
+        MinimalRrfmCalculatorOverlay calculatorOverlay = MinimalRrfmCalculatorOverlay(calcOverlay);
+
+        assertEq(calculatorOverlay.authorizedAccounts(address(this)), 0);
+        assertEq(calculatorOverlay.authorizedAccounts(address(overlay)), 0);
+        assertEq(calculatorOverlay.authorizedAccounts(pauseProxy), 1);
+        assertEq(CalculatorLike(calc).authorities(calcOverlay), 1);
+
+        (int256 upperBound, int256 lowerBound) = calculatorOverlay.signedBounds(bytes32("sg"));
+        assertEq(upperBound, int(400000000000) / 3);
+        assertEq(lowerBound,  int(10000000000) / 3);
+
+        (upperBound, lowerBound) = calculatorOverlay.signedBounds(bytes32("ag"));
+        assertEq(upperBound, int(100000) / 3);
+        assertEq(lowerBound, int(0));
+
+        (uint256 unsignedUpperBound, uint256 unsignedLowerBound) = calculatorOverlay.unsignedBounds(bytes32("pscl"));
+        assertEq(unsignedUpperBound, 1000000000000000000000000000);
+        assertEq(unsignedLowerBound,  999998844239760000000000000);
     }
 
     function testFail_swap_controller_unauthed() public {
