@@ -166,6 +166,42 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(overlay.updateDelay(), 3600);
         assertTrue(!overlay.isScaled());
     }
+    function testFail_setup_invalid_pause() public {
+        overlay = new ControllerSwapOverlay(
+            address(0),
+            RateSetterLike(address(rateSetter)),
+            OracleRelayerLike(address(oracleRelayer)),
+            3600,
+            false
+        );
+    }
+    function testFail_setup_invalid_rate_setter() public {
+        overlay = new ControllerSwapOverlay(
+            pauseProxy,
+            RateSetterLike(address(0)),
+            OracleRelayerLike(address(oracleRelayer)),
+            3600,
+            false
+        );
+    }
+    function testFail_setup_invalid_oracle_relayer() public {
+        overlay = new ControllerSwapOverlay(
+            pauseProxy,
+            RateSetterLike(address(rateSetter)),
+            OracleRelayerLike(address(0)),
+            3600,
+            false
+        );
+    }
+    function testFail_setup_invalid_update_delay() public {
+        overlay = new ControllerSwapOverlay(
+            pauseProxy,
+            RateSetterLike(address(rateSetter)),
+            OracleRelayerLike(address(oracleRelayer)),
+            0,
+            false
+        );
+    }
     function test_add_auth() public {
         overlay.addAuthorization(address(0x3));
         assertEq(overlay.authorizedAccounts(address(0x3)), 1);

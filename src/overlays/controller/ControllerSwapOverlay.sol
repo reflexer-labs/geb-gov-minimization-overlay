@@ -77,7 +77,10 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
         uint256           _updateDelay,
         bool              _isScaled
     ) public GebAuth() {
-
+        require(_pauseProxy != address(0), "ControllerSwapOverlay/invalid-pause-proxy");
+        require(address(_rateSetter) != address(0), "ControllerSwapOverlay/invalid-rate-setter");
+        require(address(_oracleRelayer) != address(0), "ControllerSwapOverlay/invalid-oracle-relayer");
+        require(_updateDelay > 0, "ControllerSwapOverlay/invalid-update-delay");
         pauseProxy = _pauseProxy;
         rateSetter = _rateSetter;
         oracleRelayer = _oracleRelayer;
