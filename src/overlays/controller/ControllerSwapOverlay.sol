@@ -145,7 +145,7 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
     function adjustSignedBoundsForScaledPID(int256[] memory bounds, int256 redemptionPrice) internal pure returns (int256[] memory) {
         uint256 length = bounds.length;
         for (uint256 i; i < length; i++)
-            bounds[i] = divide(multiply(bounds[i], RAY), redemptionPrice);
+            bounds[i] = divide(multiply(bounds[i], redemptionPrice), RAY);
 
         return bounds;
     }
@@ -165,8 +165,8 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
 
         if (isScaled)
             calculator = address(new PIRawPerSecondCalculator(
-                divide(multiply(currentCalculator.sg(), redemptionPrice), RAY), // kp
-                divide(multiply(currentCalculator.ag(), redemptionPrice), RAY), // ki
+                divide(multiply(currentCalculator.sg(), RAY), redemptionPrice), // kp
+                divide(multiply(currentCalculator.ag(), RAY), redemptionPrice), // ki
                 currentCalculator.pscl(),                                       // perSecondCumulativeLeak
                 currentCalculator.ips(),                                        // integralPeriodSize
                 currentCalculator.nb(),                                         // noiseBarrier
@@ -176,8 +176,8 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
             ));
         else
             calculator = address(new PIScaledPerSecondCalculator(
-                divide(multiply(currentCalculator.sg(), RAY), redemptionPrice), // kp
-                divide(multiply(currentCalculator.ag(), RAY), redemptionPrice), // ki
+                divide(multiply(currentCalculator.sg(), redemptionPrice), RAY), // kp
+                divide(multiply(currentCalculator.ag(), redemptionPrice), RAY), // ki
                 currentCalculator.pscl(),                                       // perSecondCumulativeLeak
                 currentCalculator.ips(),                                        // integralPeriodSize
                 currentCalculator.nb(),                                         // noiseBarrier

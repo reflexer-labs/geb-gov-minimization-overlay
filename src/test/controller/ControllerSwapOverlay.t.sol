@@ -217,8 +217,8 @@ contract ControllerSwapOverlayTest is DSTest {
 
         int redemptionPrice = int(oracleRelayer.redemptionPrice());
 
-        assertEq(calculator.sg(), newCalculator.sg() * 3);
-        assertEq(calculator.ag(), newCalculator.ag() * 3);
+        assertEq(calculator.sg(), newCalculator.sg() / 3);
+        assertEq(calculator.ag(), newCalculator.ag() / 3);
         assertEq(calculator.pscl(), newCalculator.pscl());
         assertEq(calculator.ips(), newCalculator.ips());
         assertEq(calculator.nb(), newCalculator.nb());
@@ -307,11 +307,11 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(CalculatorLike(calc).authorities(calcOverlay), 1);
 
         (int256 upperBound, int256 lowerBound) = calculatorOverlay.signedBounds(bytes32("sg"));
-        assertEq(upperBound, int(400000000000) / 3);
-        assertEq(lowerBound,  int(10000000000) / 3);
+        assertEq(upperBound, int(400000000000) * 3);
+        assertEq(lowerBound,  int(10000000000) * 3);
 
         (upperBound, lowerBound) = calculatorOverlay.signedBounds(bytes32("ag"));
-        assertEq(upperBound, int(100000) / 3);
+        assertEq(upperBound, int(100000) * 3);
         assertEq(lowerBound, int(0));
 
         (uint256 unsignedUpperBound, uint256 unsignedLowerBound) = calculatorOverlay.unsignedBounds(bytes32("pscl"));
