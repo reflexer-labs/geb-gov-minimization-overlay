@@ -62,6 +62,9 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
 
     int256 constant RAY = 10 ** 27;
 
+    // Event
+    event ControllerDeployed(address controller, address overlay);
+
     /**
      * @notice Constructor
      * @param _pauseProxy Address of pause.proxy()
@@ -197,5 +200,7 @@ contract ControllerSwapOverlay is GebAuth, SignedSafeMath {
 
         isScaled = !isScaled;
         lastUpdateTime = now;
+
+        emit ControllerDeployed(calculator, overlay);
     }
 }
