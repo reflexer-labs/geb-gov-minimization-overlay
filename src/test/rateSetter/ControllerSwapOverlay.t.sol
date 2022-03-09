@@ -2,7 +2,7 @@ pragma solidity 0.6.7;
 
 import "ds-test/test.sol";
 
-import "../../overlays/controller/ControllerSwapOverlay.sol";
+import "../../overlays/rateSetter/ControllerSwapOverlay.sol";
 
 contract RateSetterMock {
     address public pidCalculator;
@@ -33,7 +33,7 @@ contract CalculatorMock {
     function dos(uint) external pure returns (uint, int, int) {
         return (
             1646456171,
-            -878977039364788994730968,
+            -878977039364788994730966,
             -6672548645695324120975822161645
         );
     }
@@ -116,6 +116,7 @@ contract ControllerSwapOverlayTest is DSTest {
             pauseProxy,
             RateSetterLike(address(rateSetter)),
             OracleRelayerLike(address(oracleRelayer)),
+            new ControllerFactory(),
             3600,
             false
         );
@@ -171,6 +172,7 @@ contract ControllerSwapOverlayTest is DSTest {
             address(0),
             RateSetterLike(address(rateSetter)),
             OracleRelayerLike(address(oracleRelayer)),
+            new ControllerFactory(),
             3600,
             false
         );
@@ -180,6 +182,7 @@ contract ControllerSwapOverlayTest is DSTest {
             pauseProxy,
             RateSetterLike(address(0)),
             OracleRelayerLike(address(oracleRelayer)),
+            new ControllerFactory(),
             3600,
             false
         );
@@ -189,6 +192,17 @@ contract ControllerSwapOverlayTest is DSTest {
             pauseProxy,
             RateSetterLike(address(rateSetter)),
             OracleRelayerLike(address(0)),
+            new ControllerFactory(),
+            3600,
+            false
+        );
+    }
+    function testFail_setup_invalid_controller_factory() public {
+        overlay = new ControllerSwapOverlay(
+            pauseProxy,
+            RateSetterLike(address(rateSetter)),
+            OracleRelayerLike(address(oracleRelayer)),
+            ControllerFactory(address(0)),
             3600,
             false
         );
@@ -198,6 +212,7 @@ contract ControllerSwapOverlayTest is DSTest {
             pauseProxy,
             RateSetterLike(address(rateSetter)),
             OracleRelayerLike(address(oracleRelayer)),
+            new ControllerFactory(),
             0,
             false
         );
@@ -225,14 +240,14 @@ contract ControllerSwapOverlayTest is DSTest {
         assertEq(calculator.foub(), newCalculator.foub());
         assertEq(calculator.folb(), newCalculator.folb());
         assertEq(calculator.lut(), newCalculator.lut());
-        assertEq(calculator.pdc(), newCalculator.pdc());
+        assertEq(calculator.pdc(), newCalculator.pdc() * 3);
 
         // check imported state matches last state of previous controller
         (uint oldTimestamp, int oldProportionalDeviationObservation, int oldIntegralDeviationObservation) = calculator.dos(calculator.oll() - 1);
         (uint newTimestamp, int newProportionalDeviationObservation, int newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
         assertEq(oldTimestamp, newTimestamp);
-        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation);
-        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation);
+        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation * 3);
+        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation * 3);
 
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));
@@ -241,28 +256,28 @@ contract ControllerSwapOverlayTest is DSTest {
     }
 
     function test_swap_controller_to_raw() public {
-        overlay.swapCalculator();
-        hevm.warp(now + 3600);
-
         (address calc,) = overlay.swapCalculator();
+        calculator = CalculatorMock(calc);
+        hevm.warp(now + 3600);
+        (calc,) = overlay.swapCalculator();
 
         CalculatorLike newCalculator = CalculatorLike(calc);
 
-        assertEq(calculator.sg(), newCalculator.sg());
-        assertEq(calculator.ag(), newCalculator.ag());
+        assertEq(calculator.sg(), newCalculator.sg() * 3);
+        assertEq(calculator.ag(), newCalculator.ag() * 3);
         assertEq(calculator.pscl(), newCalculator.pscl());
         assertEq(calculator.ips(), newCalculator.ips());
         assertEq(calculator.nb(), newCalculator.nb());
         assertEq(calculator.foub(), newCalculator.foub());
         assertEq(calculator.folb(), newCalculator.folb());
         assertEq(calculator.lut(), newCalculator.lut());
-        assertEq(calculator.pdc(), newCalculator.pdc());
+        assertEq(calculator.pdc(), newCalculator.pdc() / 3);
 
         (uint oldTimestamp, int oldProportionalDeviationObservation, int oldIntegralDeviationObservation) = calculator.dos(calculator.oll() - 1);
         (uint newTimestamp, int newProportionalDeviationObservation, int newIntegralDeviationObservation) = newCalculator.dos(newCalculator.oll() - 1);
         assertEq(oldTimestamp, newTimestamp);
-        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation);
-        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation);
+        assertEq(oldProportionalDeviationObservation, newProportionalDeviationObservation / 3);
+        assertEq(oldIntegralDeviationObservation, newIntegralDeviationObservation / 3);
 
         assertEq(rateSetter.pidCalculator(), calc);
         assertEq(newCalculator.seedProposer(), address(rateSetter));
