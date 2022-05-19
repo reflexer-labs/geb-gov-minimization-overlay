@@ -10,7 +10,7 @@ contract MinimalLenderFirstResortOverlay is GebAuth {
     GebLenderFirstResortRewardsLike public staking;
 
     // Max amount of staked tokens to keep
-    uint256                         public maxStakedTokensToKeep;
+    uint256 public maxStakedTokensToKeep;
 
     constructor(address staking_, uint256 maxStakedTokensToKeep_) public GebAuth() {
         require(staking_ != address(0), "MinimalLenderFirstResortOverlay/null-address");
