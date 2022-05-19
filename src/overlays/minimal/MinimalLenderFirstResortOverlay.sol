@@ -42,6 +42,4 @@ contract MinimalLenderFirstResortOverlay is GebAuth {
     function toggleBypassAuctions() external isAuthorized {
         staking.toggleBypassAuctions();
     }
-
-
 }
