@@ -6,7 +6,7 @@ abstract contract RrfmCalculatorLike {
     function modifyParameters(bytes32, uint256) virtual external;
     function modifyParameters(bytes32, int256) virtual external;
 }
-contract MinimalRrfmCalculatorOverlay is GebAuth {
+contract PartialRrfmCalculatorOverlay is GebAuth {
     // --- Vars ---
     mapping(bytes32 => UnsignedBounds) public unsignedBounds;
     mapping(bytes32 => SignedBounds)   public signedBounds;
