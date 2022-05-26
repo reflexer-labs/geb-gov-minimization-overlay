@@ -5,13 +5,26 @@ import "ds-test/test.sol";
 import "../../overlays/minimal/MinimalStabilityFeeTreasuryOverlay.sol";
 
 contract User {
-    function doTakeFunds(MinimalStabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {
-        overlay.takeFunds(dst, amount);
+    function doSetTotalAllowance(MinimalStabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {
+        overlay.setTotalAllowance(dst, amount);
+    }
+    function doSetPerBlocklAllowance(MinimalStabilityFeeTreasuryOverlay overlay, address dst, uint256 amount) external {
+        overlay.setPerBlockAllowance(dst, amount);
+    }
+    function doModifyParameters(MinimalStabilityFeeTreasuryOverlay overlay, bytes32 param, uint256 val) external {
+        overlay.modifyParameters(param, val);
     }
 }
 contract StabilityFeeTreasury {
-    function takeFunds(address dst, uint256 amount) external {
+    mapping (bytes32 => uint256) public params;
+    function setTotalAllowance(address dst, uint256 amount) external {
         return;
+    }
+    function setPerBlockAllowance(address dst, uint256 amount) external {
+        return;
+    }
+    function modifyParameters(bytes32 param, uint256 val) external {
+        params[param] = val;
     }
 }
 
@@ -38,10 +51,23 @@ contract MinimalStabilityFeeTreasuryOverlayTest is DSTest {
         overlay.removeAuthorization(address(this));
         assertEq(overlay.authorizedAccounts(address(this)), 0);
     }
-    function test_take_funds() public {
-        overlay.takeFunds(address(0x1), 1 ether);
+    function test_set_total_allowance() public {
+        overlay.setTotalAllowance(address(0x1), 1 ether);
     }
-    function testFail_take_funds_unauthed() public {
-        user.doTakeFunds(overlay, address(0x1), 1 ether);
+    function testFail_set_total_allowance_unauthed() public {
+        user.doSetTotalAllowance(overlay, address(0x1), 1 ether);
+    }
+    function test_set_per_block_allowance() public {
+        overlay.setPerBlockAllowance(address(0x1), 2 ether);
+    }
+    function testFail_set_per_block_allowance_unauthed() public {
+        user.doSetPerBlocklAllowance(overlay, address(0x1), 2 ether);
+    }
+    function test_modify_parameters(bytes32 param, uint256 val) public {
+        overlay.modifyParameters(param, val);
+        assertEq(treasury.params(param), val);
+    }
+    function testFail_modify_parameters_unauthed() public {
+        user.doModifyParameters(overlay, bytes32("0x0"), 2 ether);
     }
 }
