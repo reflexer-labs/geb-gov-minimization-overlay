@@ -3,7 +3,8 @@ pragma solidity 0.6.7;
 import "../../auth/GebAuth.sol";
 
 abstract contract StabilityFeeTreasuryLike {
-    function takeFunds(address, uint256) virtual external;
+    function setTotalAllowance(address, uint256) virtual external;
+    function setPerBlockAllowance(address, uint256) virtual external;
     function modifyParameters(bytes32, uint256) virtual external;
 }
 contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
@@ -19,22 +20,30 @@ contract MinimalStabilityFeeTreasuryOverlay is GebAuth {
         assembly{ z := or(x, y)}
     }
 
-    /*
-    * @notify Call the treasury so it can take funds from another address
-    * @param account The address that the treasury should take funds from
-    * @amount The amount of funds the treasury should take from the account
-    */
-    function takeFunds(address account, uint256 amount) external isAuthorized {
-        treasury.takeFunds(account, amount);
+    /**
+     * @notice Modify an address' total allowance in order to withdraw SF from the treasury
+     * @param account The approved address
+     * @param rad The total approved amount of SF to withdraw (number with 45 decimals)
+     */
+    function setTotalAllowance(address account, uint256 rad) external isAuthorized {
+        treasury.setTotalAllowance(account, rad);
     }
-    /*
-    * @notify Modify an uint256 param
-    * @param parameter Must be "lastUpdateTime"
-    * @param data The new value for lastUpdateTime
-    */
+
+    /**
+     * @notice Modify an address' per block allowance in order to withdraw SF from the treasury
+     * @param account The approved address
+     * @param rad The per block approved amount of SF to withdraw (number with 45 decimals)
+     */
+    function setPerBlockAllowance(address account, uint256 rad) external isAuthorized {
+        treasury.setPerBlockAllowance(account, rad);
+    }
+
+    /**
+     * @notice Modify an uint256 param
+     * @param parameter Parameter, any allowed
+     * @param data The new value
+     */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
-        if (either(either(parameter == "treasuryCapacity", parameter == "minimumFundsRequired"), parameter == "pullFundsMinThreshold")) {
-          treasury.modifyParameters(parameter, data);
-        } else revert("MinimalStabilityFeeTreasuryOverlay/modify-forbidden-param");
+        treasury.modifyParameters(parameter, data);
     }
 }

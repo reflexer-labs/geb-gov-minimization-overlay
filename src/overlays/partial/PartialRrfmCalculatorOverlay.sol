@@ -6,7 +6,7 @@ abstract contract RrfmCalculatorLike {
     function modifyParameters(bytes32, uint256) virtual external;
     function modifyParameters(bytes32, int256) virtual external;
 }
-contract MinimalRrfmCalculatorOverlay is GebAuth {
+contract PartialRrfmCalculatorOverlay is GebAuth {
     // --- Vars ---
     mapping(bytes32 => UnsignedBounds) public unsignedBounds;
     mapping(bytes32 => SignedBounds)   public signedBounds;
@@ -76,9 +76,8 @@ contract MinimalRrfmCalculatorOverlay is GebAuth {
         if (parameter == "allReaderToggle") {
             calculator.modifyParameters(parameter, uint(1));
         }
-        else if (parameter == "pscl") {
-            if (either(bounds.upperBound != 0, bounds.lowerBound != 0))
-                require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
+        else if (either(bounds.upperBound != 0, bounds.lowerBound != 0)) {
+            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
             calculator.modifyParameters(parameter, val);
         }
         else revert("MinimalRrfmCalculatorOverlay/modify-forbidden-param");
@@ -95,9 +94,8 @@ contract MinimalRrfmCalculatorOverlay is GebAuth {
         if (parameter == "pdc") {
             calculator.modifyParameters(parameter, int(0));
         }
-        else if (either(parameter == "sg", parameter == "ag")) {
-            if (either(bounds.upperBound != 0, bounds.lowerBound != 0))
-                require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
+        else if (either(bounds.upperBound != 0, bounds.lowerBound != 0)) {
+            require(both(val >= bounds.lowerBound, val <= bounds.upperBound), "MinimalRrfmCalculatorOverlay/invalid-value");
             calculator.modifyParameters(parameter, val);
         }
         else revert("MinimalRrfmCalculatorOverlay/modify-forbidden-param");
