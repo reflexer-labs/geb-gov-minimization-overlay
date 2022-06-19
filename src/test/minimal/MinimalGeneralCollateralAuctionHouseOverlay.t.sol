@@ -7,7 +7,7 @@ import {SAFEEngine} from "geb/single/SAFEEngine.sol";
 import {IncreasingDiscountCollateralAuctionHouse} from "geb/single/CollateralAuctionHouse.sol";
 import {OracleRelayer} from "geb/single/OracleRelayer.sol";
 
-import {MinimalCollateralAuctionHouseOverlay} from "../../overlays/minimal/MinimalCollateralAuctionHouseOverlay.sol";
+import {MinimalGeneralCollateralAuctionHouseOverlay} from "../../overlays/minimal/MinimalGeneralCollateralAuctionHouseOverlay.sol";
 
 abstract contract Hevm {
     function warp(uint256) virtual public;
@@ -96,10 +96,10 @@ contract DummyLiquidationEngine {
     }
 }
 
-contract MinimalCollateralAuctionHouseOverlayTest is DSTest {
+contract MinimalGeneralCollateralAuctionHouseOverlayTest is DSTest {
     Hevm hevm;
 
-    MinimalCollateralAuctionHouseOverlay overlay;
+    MinimalGeneralCollateralAuctionHouseOverlay overlay;
 
     DummyLiquidationEngine liquidationEngine;
     SAFEEngine_ safeEngine;
@@ -154,7 +154,7 @@ contract MinimalCollateralAuctionHouseOverlayTest is DSTest {
         safeEngine.mint(ali, 200 ether);
         safeEngine.mint(bob, 200 ether);
 
-        overlay = new MinimalCollateralAuctionHouseOverlay(address(safeEngine), address(collateralAuctionHouse));
+        overlay = new MinimalGeneralCollateralAuctionHouseOverlay(address(safeEngine), address(collateralAuctionHouse));
         collateralAuctionHouse.addAuthorization(address(overlay));
     }
 
@@ -211,11 +211,5 @@ contract MinimalCollateralAuctionHouseOverlayTest is DSTest {
         ) = collateralAuctionHouse.bids(1);
         assertEq(amountToSell, 0);
         assertEq(amountToRaise, 0);
-    }
-    function testFail_unauthed_transfer_internal_collateral() public {
-        safeEngine.modifyCollateralBalance("collateralType", address(overlay), 1000 ether);
-        overlay.transferCollateral("collateralType", address(0x1), 100 ether);
-        uint collateralAmount = safeEngine.tokenCollateral("collateralType", address(0x1));
-        assertEq(collateralAmount, 100 ether);
     }
 }

@@ -9,13 +9,13 @@ abstract contract SAFEEngineLike {
     function transferCollateral(bytes32,address,address,uint256) virtual external;
 }
 
-contract MinimalCollateralAuctionHouseOverlay is GebAuth {
+contract MinimalGeneralCollateralAuctionHouseOverlay is GebAuth {
     SAFEEngineLike             public safeEngine;
     CollateralAuctionHouseLike public collateralAuctionHouse;
 
     constructor(address safeEngine_, address collateralAuctionHouse_) public GebAuth() {
-        require(collateralAuctionHouse_ != address(0), "MinimalCollateralAuctionHouseOverlay/null-address");
-        require(safeEngine_ != address(0), "MinimalCollateralAuctionHouseOverlay/null-address");
+        require(collateralAuctionHouse_ != address(0), "MinimalGeneralCollateralAuctionHouseOverlay/null-address");
+        require(safeEngine_ != address(0), "MinimalGeneralCollateralAuctionHouseOverlay/null-address");
         safeEngine             = SAFEEngineLike(safeEngine_);
         collateralAuctionHouse = CollateralAuctionHouseLike(collateralAuctionHouse_);
     }

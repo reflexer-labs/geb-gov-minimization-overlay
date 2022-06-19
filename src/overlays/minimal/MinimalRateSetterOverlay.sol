@@ -6,18 +6,12 @@ abstract contract RateSetterLike {
     function modifyParameters(bytes32, address) virtual external;
 }
 contract MinimalRateSetterOverlay is GebAuth {
-    address        public pCalculator;
-    address        public piCalculator;
-
     RateSetterLike public rateSetter;
 
-    constructor(address rateSetter_, address pCalculator_, address piCalculator_) public {
+    constructor(address rateSetter_) public {
         require(rateSetter_ != address(0), "MinimalRateSetterOverlay/null-address");
-        require(both(pCalculator_ != address(0), piCalculator_ != address(0)), "MinimalRateSetterOverlay/null-calculators");
 
         rateSetter   = RateSetterLike(rateSetter_);
-        pCalculator  = pCalculator_;
-        piCalculator = piCalculator_;
     }
 
     // --- Boolean Logic ---
@@ -35,9 +29,6 @@ contract MinimalRateSetterOverlay is GebAuth {
     */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         if (parameter == "orcl") {
-          rateSetter.modifyParameters(parameter, data);
-        } else if (parameter == "pidCalculator") {
-          require(either(data == pCalculator, data == piCalculator), "MinimalRateSetterOverlay/invalid-calculator-address");
           rateSetter.modifyParameters(parameter, data);
         } else revert("MinimalRateSetterOverlay/modify-forbidden-param");
     }
