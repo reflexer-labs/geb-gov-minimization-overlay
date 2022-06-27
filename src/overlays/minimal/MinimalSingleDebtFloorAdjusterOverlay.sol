@@ -21,14 +21,17 @@ contract MinimalSingleDebtFloorAdjusterOverlay is GebAuth {
 
     /*
     * @notify Modify "lastUpdateTime"
-    * @param parameter Must be "lastUpdateTime"
+    * @param parameter Must be "lastUpdateTime", "maxPriceDeviation" or "auctionDiscount"
     * @param data The new value for lastUpdateTime
     */
     function modifyParameters(bytes32 parameter, uint256 data) external isAuthorized {
         if (parameter == "lastUpdateTime") {
           require(data >= block.timestamp, "MinimalSingleDebtFloorAdjusterOverlay/invalid-data");
           adjuster.modifyParameters(parameter, data);
-        } else revert("MinimalSingleDebtFloorAdjusterOverlay/modify-forbidden-param");
+        } else if(either(parameter == "maxPriceDeviation", parameter == "auctionDiscount")) {
+          adjuster.modifyParameters(parameter, data);
+        }
+        else revert("MinimalSingleDebtFloorAdjusterOverlay/modify-forbidden-param");
     }
     /*
     * @notify Modify address params
