@@ -6,6 +6,7 @@ abstract contract AccountingEngineLike {
     function modifyParameters(bytes32, address) virtual external;
     function modifyParameters(bytes32, uint256) virtual external;
 }
+
 contract MinimalAccountingEngineOverlay is GebAuth {
     AccountingEngineLike public accountingEngine;
 
