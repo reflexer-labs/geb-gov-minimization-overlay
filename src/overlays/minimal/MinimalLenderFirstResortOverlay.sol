@@ -5,6 +5,7 @@ import "../../auth/GebAuth.sol";
 abstract contract GebLenderFirstResortRewardsLike {
     function modifyParameters(bytes32, uint256) virtual external;
     function toggleBypassAuctions() virtual external;
+    function toggleForcedExit() virtual external;
 }
 contract MinimalLenderFirstResortOverlay is GebAuth {
     GebLenderFirstResortRewardsLike public staking;
@@ -34,6 +35,13 @@ contract MinimalLenderFirstResortOverlay is GebAuth {
             parameter == "systemCoinsToRequest"
             ) staking.modifyParameters(parameter, data);
         else revert("MinimalLenderFirstResortOverlay/modify-forbidden-param");
+    }
+
+    /*
+    * @notice Allow/disallow stakers to exit without extra checks
+    */
+    function toggleForcedExit() external isAuthorized {
+        staking.toggleForcedExit();
     }
 
     /*
