@@ -13,6 +13,7 @@ contract LenderFirstResort {
     uint256 public escrowPaused;
     uint256 public minStakedTokensToKeep;
     uint256 public bypassAuctions;
+    uint256 public isExitForced;
     uint256 public tokensToAuction;
     uint256 public systemCoinsToRequest;
 
@@ -25,6 +26,10 @@ contract LenderFirstResort {
 
     function toggleBypassAuctions() public {
         bypassAuctions = bypassAuctions == 0 ? 1 : 0;
+    }
+
+    function toggleForcedExit() public {
+        isExitForced = isExitForced == 0 ? 1 : 0;
     }
 }
 
@@ -82,5 +87,12 @@ contract MinimalLenderFirstResortOverlayTest is DSTest {
     function test_set_systemCoinsToRequest() public {
         overlay.modifyParameters("systemCoinsToRequest", 100 ether);
         assertEq(staking.systemCoinsToRequest(), 100 ether);
+    }
+    function test_toggle_forced_exit() public {
+        overlay.toggleForcedExit();
+        assertEq(staking.isExitForced(), 1);
+
+        overlay.toggleForcedExit();
+        assertEq(staking.isExitForced(), 0);
     }
 }

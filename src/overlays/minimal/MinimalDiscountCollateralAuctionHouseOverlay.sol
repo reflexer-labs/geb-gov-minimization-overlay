@@ -8,6 +8,7 @@ abstract contract DiscountCollateralAuctionHouseLike {
 }
 contract MinimalDiscountCollateralAuctionHouseOverlay is GebAuth {
     uint256                            public discountLimit;
+    uint256                            public constant WAD = 10 ** 18;
 
     DiscountCollateralAuctionHouseLike public auctionHouse;
 
@@ -39,7 +40,7 @@ contract MinimalDiscountCollateralAuctionHouseOverlay is GebAuth {
         );
 
         if (parameter == "maxDiscount") {
-            require(data >= discountLimit), "MinimalDiscountCollateralAuctionHouseOverlay/invalid-max-discount");
+            require(data >= discountLimit, "MinimalDiscountCollateralAuctionHouseOverlay/invalid-max-discount");
         }
 
         auctionHouse.modifyParameters(parameter, data);

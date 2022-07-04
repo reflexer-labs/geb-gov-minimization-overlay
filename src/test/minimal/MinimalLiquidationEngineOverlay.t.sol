@@ -43,14 +43,18 @@ contract MinimalLiquidationEngineOverlayTest is DSTest {
     GenuineSaviour saviour;
     User user;
 
+    uint256 minPenalty = 1090000000000000000;
+    uint256 maxPenalty = 1150000000000000000;
+
     function setUp() public {
         safeEngine        = new SimpleSAFEEngine();
         liquidationEngine = new LiquidationEngine(address(safeEngine));
-        overlay           = new MinimalLiquidationEngineOverlay(address(liquidationEngine));
+        overlay           = new MinimalLiquidationEngineOverlay(address(liquidationEngine), minPenalty, maxPenalty);
         saviour           = new GenuineSaviour(address(safeEngine), address(liquidationEngine));
         user              = new User();
 
         liquidationEngine.addAuthorization(address(overlay));
+        liquidationEngine.modifyParameters("gold", "liquidationPenalty", 1020000000000000000);
     }
 
     function test_setup() public {
@@ -80,5 +84,16 @@ contract MinimalLiquidationEngineOverlayTest is DSTest {
     function testFail_disconnect_by_unauthed() public {
         overlay.connectSAFESaviour(address(saviour));
         user.doDisconnectSaviour(overlay, address(saviour));
+    }
+    function testFail_set_too_high_penalty() public {
+        overlay.modifyParameters("gold", "liquidationPenalty", maxPenalty + 1);
+    }
+    function testFail_set_too_low_penalty() public {
+        overlay.modifyParameters("gold", "liquidationPenalty", minPenalty - 1);
+    }
+    function test_set_penalty() public {
+        overlay.modifyParameters("gold", "liquidationPenalty", minPenalty + 1);
+        (, uint256 liquidationPenalty, ) = liquidationEngine.collateralTypes("gold");
+        assertEq(liquidationPenalty, minPenalty + 1);
     }
 }
