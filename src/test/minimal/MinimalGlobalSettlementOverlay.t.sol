@@ -80,7 +80,7 @@ contract MinimalGlobalSettlementOverlayTest is DSTest {
         assertEq(overlay.settlementExecutionDate(), now + shutdownDelay);
         hevm.warp(now + shutdownDelay + 1);
 
-        overlay.shutdown();
+        overlay.shutdownSystem();
         assertEq(overlay.settlementExecutionDate(), 0);
     }
 }
